@@ -1,0 +1,3 @@
+interface:
+  display_name: "Flutter 라이선스 검토"
+  short_description: "Dart·Flutter 의존성의 라이선스를 검사하거나 제공된 스캔 결과를 검토할 때 사용한다. 직접·간접 의"

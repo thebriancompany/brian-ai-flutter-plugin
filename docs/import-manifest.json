@@ -1,0 +1,351 @@
+{
+  "source_revision": "496a3c6d857476b3f75bc7bca292eff9ba18c7d1",
+  "source_version": "0.0.5",
+  "adapted_on": "2026-10-12",
+  "source_skills": 15,
+  "source_skill_documents": 67,
+  "source_reviewers": 1,
+  "target_skills": 16,
+  "files": [
+    {
+      "source": "skills/accessibility/SKILL.md",
+      "source_sha256": "437705703430b70a1f129f8c6718a09f24452a4e37f7f3f6ea6f639ca1389969",
+      "target": "skills/flutter-accessibility/SKILL.md"
+    },
+    {
+      "source": "skills/accessibility/references/audit-templates.md",
+      "source_sha256": "5ab1a507aab14cb2869f11818a9f9372f6c753892af7fb2245dabc67c2f27fc8",
+      "target": "skills/flutter-accessibility/references/audit-templates.md"
+    },
+    {
+      "source": "skills/accessibility/references/examples.md",
+      "source_sha256": "de7e96c7f93f782ca2d7b73bc806472be962c0c8683b2d800951e73550ebe2fa",
+      "target": "skills/flutter-accessibility/references/examples.md"
+    },
+    {
+      "source": "skills/accessibility/references/platforms/android.md",
+      "source_sha256": "3513d5d5eaf3a754adeebdc23dfdde1ba179930c3d7c6221c7e746ffd3bf742f",
+      "target": "skills/flutter-accessibility/references/platforms/android.md"
+    },
+    {
+      "source": "skills/accessibility/references/platforms/ios.md",
+      "source_sha256": "c8843bd506b92ec920221f48c1d3c8f5b1e6de23840394bb5b33c0c31c4bf5cc",
+      "target": "skills/flutter-accessibility/references/platforms/ios.md"
+    },
+    {
+      "source": "skills/accessibility/references/platforms/linux.md",
+      "source_sha256": "3cc3ea31491ca9a2da42d73ea9043c60ea0b9af4ad1f409ff6b550e2bbbd22e5",
+      "target": "skills/flutter-accessibility/references/platforms/linux.md"
+    },
+    {
+      "source": "skills/accessibility/references/platforms/macos.md",
+      "source_sha256": "f663e908ddc5f93a404ffe1a9c48c69ae8fbbef1102188b1db7b981690f0167f",
+      "target": "skills/flutter-accessibility/references/platforms/macos.md"
+    },
+    {
+      "source": "skills/accessibility/references/platforms/web.md",
+      "source_sha256": "bc811faf2162bc5147e6feb41d0b3333576427a75ebab1d3968e8d20623785f0",
+      "target": "skills/flutter-accessibility/references/platforms/web.md"
+    },
+    {
+      "source": "skills/accessibility/references/platforms/windows.md",
+      "source_sha256": "23170986e7e204f3c70fcdf23ab40867a294a0b321344a29651f1745f957ad21",
+      "target": "skills/flutter-accessibility/references/platforms/windows.md"
+    },
+    {
+      "source": "skills/accessibility/references/testing.md",
+      "source_sha256": "9f805a50f15631761de2dfb262263532db01ab759512b0702701368df377bedd",
+      "target": "skills/flutter-accessibility/references/testing.md"
+    },
+    {
+      "source": "skills/accessibility/references/wcag-criteria.md",
+      "source_sha256": "ceb22747950316d9f78603fa29f7f7094d1ad225781102fb91c581718b25865f",
+      "target": "skills/flutter-accessibility/references/wcag-criteria.md"
+    },
+    {
+      "source": "skills/accessibility/references/widget-mapping.md",
+      "source_sha256": "ff22b168f8e8834407e71b715e6af1c540430d10118a27828278975f9397453d",
+      "target": "skills/flutter-accessibility/references/widget-mapping.md"
+    },
+    {
+      "source": "skills/animations/SKILL.md",
+      "source_sha256": "f7d992cb04bdc8b42a0b7661d354ad1fe68d60149184d8e862c570529bb08bdc",
+      "target": "skills/flutter-animations/SKILL.md"
+    },
+    {
+      "source": "skills/animations/references/explicit-animations.md",
+      "source_sha256": "e645069e71a04301c2bc97d8096930218491b7ac24bdf4f03c97d05ea382e7f7",
+      "target": "skills/flutter-animations/references/explicit-animations.md"
+    },
+    {
+      "source": "skills/animations/references/implicit-animations.md",
+      "source_sha256": "3deac65196a58050c0d78ee79e51d767b146aebdea48c4a26f7f01a07f5d8572",
+      "target": "skills/flutter-animations/references/implicit-animations.md"
+    },
+    {
+      "source": "skills/animations/references/looping-animations.md",
+      "source_sha256": "76ffceb9109a08c8d6968c65584a3ab22673538a4b5c87893d7082b998dbf11f",
+      "target": "skills/flutter-animations/references/looping-animations.md"
+    },
+    {
+      "source": "skills/animations/references/page-transitions.md",
+      "source_sha256": "2960cdd57704c226ab0110ce0407bef1ad47922d7bd6c0d2ad09aa46dcfc0ecc",
+      "target": "skills/flutter-animations/references/page-transitions.md"
+    },
+    {
+      "source": "skills/animations/references/staggered-animations.md",
+      "source_sha256": "56f49dee60c932ad29fdf2a2a01c039b505503a47ecc799aef8c93868a1d0d22",
+      "target": "skills/flutter-animations/references/staggered-animations.md"
+    },
+    {
+      "source": "skills/bloc/SKILL.md",
+      "source_sha256": "703f2480db1165001d69a091e7f428629ee6a1d1a130683c28f3851207ecd1cf",
+      "target": "skills/flutter-bloc/SKILL.md"
+    },
+    {
+      "source": "skills/bloc/references/architecture.md",
+      "source_sha256": "4b50a05275ff6504701ab06e03c1f8fa7f4f39126786c4add743db030f510ebc",
+      "target": "skills/flutter-bloc/references/architecture.md"
+    },
+    {
+      "source": "skills/bloc/references/patterns.md",
+      "source_sha256": "1c6ee9e5900e5478c88b61ec555d7152d6c1f2e18c8325891ca2d6f0082d6b10",
+      "target": "skills/flutter-bloc/references/patterns.md"
+    },
+    {
+      "source": "skills/bloc/references/testing.md",
+      "source_sha256": "cf6b0b846f7e70db95439c5d2d57935e49d1159c1b02b6c65c110a1036b61f8d",
+      "target": "skills/flutter-bloc/references/testing.md"
+    },
+    {
+      "source": "skills/bloc/references/widgets.md",
+      "source_sha256": "a7bcc63358ec773d153804a421a9ce9df5ef1e51d64b363458d353a66a327a3c",
+      "target": "skills/flutter-bloc/references/widgets.md"
+    },
+    {
+      "source": "skills/create-project/SKILL.md",
+      "source_sha256": "06f5497b39de71352e34eedc87ec119567ae628a85af08fcd808dbf664221efb",
+      "target": "skills/flutter-create-project/SKILL.md"
+    },
+    {
+      "source": "skills/dart-flutter-sdk-upgrade/SKILL.md",
+      "source_sha256": "8ff6d0b3222ef1a639aab0e8c1593b73ce3ce416c250002b8607538308f21cad",
+      "target": "skills/flutter-sdk-upgrade/SKILL.md"
+    },
+    {
+      "source": "skills/dart-flutter-sdk-upgrade/references/version-conflicts.md",
+      "source_sha256": "ae6dacfba49e60feb24369a4b42f568c028cc6c9689b3f3cc5afbeef26bfc814",
+      "target": "skills/flutter-sdk-upgrade/references/version-conflicts.md"
+    },
+    {
+      "source": "skills/green-gate/SKILL.md",
+      "source_sha256": "78496d2b937301b9e240d9d009279e2b7e075a024f8bb3131bd135d9ac3640d1",
+      "target": "skills/flutter-green-gate/SKILL.md"
+    },
+    {
+      "source": "skills/green-gate/references/coverage.md",
+      "source_sha256": "57e9513ad36e33475a01d26547cb8e5276d98cef8e93d605c97d8f57f22aacdc",
+      "target": "skills/flutter-green-gate/references/coverage.md"
+    },
+    {
+      "source": "skills/internationalization/SKILL.md",
+      "source_sha256": "c76c64a07bf105fb1da9bb362ab4506f709d2fb6a18becb56d00c801c87e5326",
+      "target": "skills/flutter-internationalization/SKILL.md"
+    },
+    {
+      "source": "skills/internationalization/references/backend.md",
+      "source_sha256": "aeb4eb22611692f6efdb0adb8fdc464b2a60e17412622d55c4a18deb1740f92b",
+      "target": "skills/flutter-internationalization/references/backend.md"
+    },
+    {
+      "source": "skills/internationalization/references/directionality.md",
+      "source_sha256": "81a81e71415e69050ac1b4d6153f5e33aabbb872b00efb193f83eed703c4cd61",
+      "target": "skills/flutter-internationalization/references/directionality.md"
+    },
+    {
+      "source": "skills/internationalization/references/setup.md",
+      "source_sha256": "9d232db666d86c1668f2df42d6e94afe5fafb4a61194512cc2c0a9fbbf313293",
+      "target": "skills/flutter-internationalization/references/setup.md"
+    },
+    {
+      "source": "skills/layered-architecture/SKILL.md",
+      "source_sha256": "0376d7dbd3c11f4947a83e6bfbc4977576e44dfd967d186c19c2ebf127b8352b",
+      "target": "skills/flutter-layered-architecture/SKILL.md"
+    },
+    {
+      "source": "skills/layered-architecture/references/data-flow.md",
+      "source_sha256": "41d738ae0a45819d2ebd1d8cf5515bd47109c982a4d487848ec103236a11012d",
+      "target": "skills/flutter-layered-architecture/references/data-flow.md"
+    },
+    {
+      "source": "skills/layered-architecture/references/model-transformation.md",
+      "source_sha256": "870ad8da4e9b0761fba2e21d0dc97f035817ee74f10e0089fb6413fa1c557fa0",
+      "target": "skills/flutter-layered-architecture/references/model-transformation.md"
+    },
+    {
+      "source": "skills/layered-architecture/references/pubspec.md",
+      "source_sha256": "0f823b60427e407ec37eccb5713c399bd3ea9db429aca56b1e5cf90d3e930bad",
+      "target": "skills/flutter-layered-architecture/references/pubspec.md"
+    },
+    {
+      "source": "skills/layered-architecture/references/testing.md",
+      "source_sha256": "43248e1645b33daddaf6a555e50d2bae60fbc6e2961dde48c93908cbb642ebe9",
+      "target": "skills/flutter-layered-architecture/references/testing.md"
+    },
+    {
+      "source": "skills/layered-architecture/references/worked-example.md",
+      "source_sha256": "800222357b2daec1da2666319a90da146c27fe169a6a4c47300602b0765e339f",
+      "target": "skills/flutter-layered-architecture/references/worked-example.md"
+    },
+    {
+      "source": "skills/license-compliance/SKILL.md",
+      "source_sha256": "b7202ec31b182f43d3016a5aaadfa74b03251b2fe7f03d68b92de050349f3fc0",
+      "target": "skills/flutter-license-compliance/SKILL.md"
+    },
+    {
+      "source": "skills/material-theming/SKILL.md",
+      "source_sha256": "f319b459851c4d41d494e450bb472f621255daba407fce58ff94517630769838",
+      "target": "skills/flutter-material-theming/SKILL.md"
+    },
+    {
+      "source": "skills/material-theming/references/color-scheme.md",
+      "source_sha256": "4a92e1546001d1f34637a843eba64644025d903bc1d753ffd1c037eacbf45bf8",
+      "target": "skills/flutter-material-theming/references/color-scheme.md"
+    },
+    {
+      "source": "skills/material-theming/references/components.md",
+      "source_sha256": "7404122c2e298c8da618d2fb09ab8dabaf350c2e080f8c5b69cec9c581b2b6d1",
+      "target": "skills/flutter-material-theming/references/components.md"
+    },
+    {
+      "source": "skills/material-theming/references/spacing.md",
+      "source_sha256": "cf61e6883f951a41ffd135f687f39961c3edb2fa30a3515ae57b14e1bffe4721",
+      "target": "skills/flutter-material-theming/references/spacing.md"
+    },
+    {
+      "source": "skills/material-theming/references/typography.md",
+      "source_sha256": "a794ffd8a1d1c7708b85835cd3ea7fb27bdd1e4c99994d840d36cbe4cd986d9d",
+      "target": "skills/flutter-material-theming/references/typography.md"
+    },
+    {
+      "source": "skills/navigation/SKILL.md",
+      "source_sha256": "7d50ecab45535bd6d0e36476ae101db36020dd6784e4cedf26494b1e30140008",
+      "target": "skills/flutter-navigation/SKILL.md"
+    },
+    {
+      "source": "skills/navigation/references/parameters.md",
+      "source_sha256": "821889841ffc2ade5adf25a00b233016249a4c143cd54bcc805a175168fea666",
+      "target": "skills/flutter-navigation/references/parameters.md"
+    },
+    {
+      "source": "skills/navigation/references/redirects.md",
+      "source_sha256": "2e439598bf4168048f1b661d4f79548dec5fd4d7e4c00187cbccb4aa983847e8",
+      "target": "skills/flutter-navigation/references/redirects.md"
+    },
+    {
+      "source": "skills/navigation/references/testing.md",
+      "source_sha256": "d6d87024f216b1a0be49abada5eabb50268c6b70648f9d03208ad97df91e46dd",
+      "target": "skills/flutter-navigation/references/testing.md"
+    },
+    {
+      "source": "skills/navigation/references/typed-routes.md",
+      "source_sha256": "f60910f6140cd0ccc2a764ad433ee4f041fde2cb755a235d8c46b9fc938ff1f3",
+      "target": "skills/flutter-navigation/references/typed-routes.md"
+    },
+    {
+      "source": "skills/static-security/SKILL.md",
+      "source_sha256": "0baad8fb27548c79fc8518c7bda1e48a9a812aee103806fda072a8cf4da1a977",
+      "target": "skills/flutter-static-security/SKILL.md"
+    },
+    {
+      "source": "skills/static-security/references/binary-protection.md",
+      "source_sha256": "2c9dcf4a3bbacbc92cea766083e9b78dcc16dc47e2feee619462f525e5a53680",
+      "target": "skills/flutter-static-security/references/binary-protection.md"
+    },
+    {
+      "source": "skills/static-security/references/crypto.md",
+      "source_sha256": "c98eca16ff9f20b54b491539afe97bf99a5837dd1cac53f0ef884e0075ba62c9",
+      "target": "skills/flutter-static-security/references/crypto.md"
+    },
+    {
+      "source": "skills/static-security/references/packages.md",
+      "source_sha256": "dacbf06426f2e537bbc1c595715e9b65dcfac79fbaf0d913585d97c97acac141",
+      "target": "skills/flutter-static-security/references/packages.md"
+    },
+    {
+      "source": "skills/static-security/references/supply-chain.md",
+      "source_sha256": "edf92c4ede951b163bac4a5160420320ba8ebe9e5dfd2c10dac4473dc76fe01b",
+      "target": "skills/flutter-static-security/references/supply-chain.md"
+    },
+    {
+      "source": "skills/testing/SKILL.md",
+      "source_sha256": "9bb191ffbed462f5bbb29ea53ca196c29482239bb4b885a37b81f8a8f00370fd",
+      "target": "skills/flutter-testing/SKILL.md"
+    },
+    {
+      "source": "skills/testing/references/animation-testing.md",
+      "source_sha256": "67229b3e0f184e711f238bb21b26f7f54226da7211e01d96f12da511b9d86262",
+      "target": "skills/flutter-testing/references/animation-testing.md"
+    },
+    {
+      "source": "skills/testing/references/configuration.md",
+      "source_sha256": "3e9276e4ef679dcf3c313cfd4b6dd9cfce3e6dd8463877196f03442ae0963085",
+      "target": "skills/flutter-testing/references/configuration.md"
+    },
+    {
+      "source": "skills/testing/references/coverage.md",
+      "source_sha256": "804b5946016526f936870bc40a8afd47e077753471a1964a55f2f42d4b6bbc73",
+      "target": "skills/flutter-testing/references/coverage.md"
+    },
+    {
+      "source": "skills/testing/references/golden-tests.md",
+      "source_sha256": "1e6927cb72e8f3484701f6cee8e50f93c2ff4ffa33cd09bbfa23e926cb8c9207",
+      "target": "skills/flutter-testing/references/golden-tests.md"
+    },
+    {
+      "source": "skills/testing/references/matchers.md",
+      "source_sha256": "5d1fb5072671fb843218dbf92b97a4606bab0460b7b3287642a2bca7d395c934",
+      "target": "skills/flutter-testing/references/matchers.md"
+    },
+    {
+      "source": "skills/testing/references/mocktail.md",
+      "source_sha256": "038e757b610d4d6c24fe9b7c73c6e6d19f1a091bc5e5592bfd2119677b9dd945",
+      "target": "skills/flutter-testing/references/mocktail.md"
+    },
+    {
+      "source": "skills/testing/references/test-patterns.md",
+      "source_sha256": "7a4da4bb3f3da571f33f8b270396c2f9e904bb83515c19fcad43578a59853ee3",
+      "target": "skills/flutter-testing/references/test-patterns.md"
+    },
+    {
+      "source": "skills/testing/references/widget-tests.md",
+      "source_sha256": "ce3d3ea320d16268d0a3d539d67545542b915f184d952ff5dffbbcf3428c8684",
+      "target": "skills/flutter-testing/references/widget-tests.md"
+    },
+    {
+      "source": "skills/ui-package/SKILL.md",
+      "source_sha256": "ccc320a91e41f03c63fc749f8ceaf934003b6029233b7af803008cf118de43a5",
+      "target": "skills/flutter-ui-package/SKILL.md"
+    },
+    {
+      "source": "skills/ui-package/reference.md",
+      "source_sha256": "482ed9bcb48e39ed87f6d556ceffdb56710dc755c89d696162b08c7d811b30e7",
+      "target": "skills/flutter-ui-package/reference.md"
+    },
+    {
+      "source": "skills/very-good-analysis-upgrade/SKILL.md",
+      "source_sha256": "8f39485150b445715ae4bd15e189f48a11c53fb75f42b20bee31c8ec34e62a6f",
+      "target": "skills/flutter-lint-upgrade/SKILL.md"
+    },
+    {
+      "source": "skills/very-good-analysis-upgrade/references/lint-fixes.md",
+      "source_sha256": "f72c9f9628a303054184f79274a74c4c0933e5ccdf3af21fac4196a9d16eaa5d",
+      "target": "skills/flutter-lint-upgrade/references/lint-fixes.md"
+    },
+    {
+      "source": "agents/flutter-reviewer.md",
+      "source_sha256": "26ba038bbc281b55d96a821fd0babf36e1e091d45e89c11b54ae5bb05aae5360",
+      "target": "skills/flutter-review/SKILL.md"
+    }
+  ]
+}

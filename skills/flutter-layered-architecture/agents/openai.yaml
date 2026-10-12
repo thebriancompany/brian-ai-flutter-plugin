@@ -1,0 +1,3 @@
+interface:
+  display_name: "Flutter 계층형 아키텍처"
+  short_description: "Flutter 앱의 패키지·폴더 배치, 데이터·저장소·Bloc·화면의 계층 경계와 부트스트랩을 설계하거나 수"

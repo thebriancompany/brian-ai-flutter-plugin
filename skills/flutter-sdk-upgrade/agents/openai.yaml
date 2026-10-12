@@ -1,0 +1,3 @@
+interface:
+  display_name: "Flutter·Dart SDK 업그레이드"
+  short_description: "Dart·Flutter SDK와 pubspec 환경 제약, CI 버전을 갱신하거나 SDK 변경으로 생긴 의존"

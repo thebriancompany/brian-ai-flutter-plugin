@@ -1,0 +1,3 @@
+interface:
+  display_name: "Flutter 접근성"
+  short_description: "Flutter 위젯의 접근성을 감사하거나 개선할 때 사용한다. WCAG 목표 수준과 플랫폼별 의미 정보, 키"

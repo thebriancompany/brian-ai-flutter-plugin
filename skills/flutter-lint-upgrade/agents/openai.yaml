@@ -1,0 +1,3 @@
+interface:
+  display_name: "Flutter 린트 업그레이드"
+  short_description: "very_good_analysis 린트 패키지를 갱신하고 새 규칙의 경고를 최소 변경으로 해결할 때 사용한다"

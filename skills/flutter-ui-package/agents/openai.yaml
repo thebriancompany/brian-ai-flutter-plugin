@@ -1,0 +1,3 @@
+interface:
+  display_name: "Flutter UI 패키지"
+  short_description: "Flutter 공유 UI 패키지를 생성하거나 위젯·디자인 토큰·공개 API·테스트를 추가할 때 사용한다. M"

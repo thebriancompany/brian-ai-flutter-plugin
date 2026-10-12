@@ -1,0 +1,3 @@
+interface:
+  display_name: "Flutter 품질 검사"
+  short_description: "Dart·Flutter의 분석, 포맷, 테스트와 커버리지를 함께 통과시키거나 품질 검사 계획을 정할 때 사용"

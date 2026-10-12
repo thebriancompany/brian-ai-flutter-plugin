@@ -1,0 +1,3 @@
+interface:
+  display_name: "Flutter 국제화·지역화"
+  short_description: "Flutter ARB 번역, locale 설정, gen-l10n, 공유 위젯의 지역화 문자열과 RTL 배치를"
