@@ -1,0 +1,11 @@
+{
+  "name": "brian-ai-flutter-plugin",
+  "version": "0.1.0",
+  "description": "Flutter·Dart 개발을 위한 한국어 Codex 스킬 16개",
+  "license": "MIT",
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Brian Flutter 스킬",
+    "shortDescription": "한국어 Flutter·Dart 설계, 구현, 테스트와 리뷰"
+  }
+}

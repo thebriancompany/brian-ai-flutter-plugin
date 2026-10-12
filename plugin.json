@@ -1,0 +1,9 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "brian-ai-flutter-plugin",
+  "version": "0.1.0",
+  "description": "Flutter·Dart 개발을 위한 한국어 Codex 스킬 16개: 설계, 구현, 테스트, 접근성, 보안과 품질 검사",
+  "license": "MIT",
+  "repository": "https://github.com/thebriancompany/brian-ai-flutter-plugin",
+  "keywords": ["flutter", "dart", "codex", "korean", "skills"]
+}

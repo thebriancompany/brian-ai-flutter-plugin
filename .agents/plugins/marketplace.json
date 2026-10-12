@@ -1,0 +1,20 @@
+{
+  "name": "brian-flutter-local",
+  "interface": {
+    "displayName": "Brian Flutter 스킬"
+  },
+  "plugins": [
+    {
+      "name": "brian-ai-flutter-plugin",
+      "source": {
+        "source": "local",
+        "path": "./"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    }
+  ]
+}
