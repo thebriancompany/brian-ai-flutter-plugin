@@ -157,19 +157,24 @@ const encryptionKey = 'my-secret-key-123';
 ```
 
 ```dart
-// ✅ 보안용 Random.secure()
+// ✅ 보안용 Random.secure()로 최소 16바이트(128비트)를 생성한다.
+import 'dart:convert';
 import 'dart:math';
-final sessionId = Random.secure().nextInt(1 << 32).toRadixString(16);
-final iv = List.generate(16, (_) => Random.secure().nextInt(256));
+import 'package:crypto/crypto.dart';
+
+final secureRandom = Random.secure();
+final sessionBytes = List<int>.generate(16, (_) => secureRandom.nextInt(256));
+final sessionId = base64UrlEncode(sessionBytes);
+final iv = List<int>.generate(16, (_) => secureRandom.nextInt(256));
 
 // ✅ 표준 해시: 비밀번호 저장용 해시와 구분한다.
-import 'package:crypto/crypto.dart';
-import 'dart:convert';
 final hash = sha256.convert(utf8.encode(data)).toString();
 
 // ✅ 소스 코드가 아닌 보호 저장소에서 얻은 키
 final key = await storage.read(key: 'encryption_key');
 ```
+
+세션 식별자는 `Random.secure()` 사용 여부와 별개로 최소 16바이트의 난수를 채워 hex 또는 base64url로 인코딩한다. 32비트 정수 하나는 가능한 값이 `2^32`개뿐이며 인코딩해도 출력 공간이 늘어나지 않는다. 인증 세션은 서버에서 발급·검증한다. IV 길이와 유일성 요건은 사용하는 암호 알고리즘을 따른다.
 
 보안 용도로 MD5·SHA-1·DES·RC4·ECB를 피한다. 일반 해시와 비밀번호 저장 해시를 구분한다. 새 서버 비밀번호 저장에는 OWASP의 최신 지침을 확인하고 Argon2id 같은 적응형 해시를 검토한다. 빠른 SHA-256을 비밀번호 저장용으로 사용하지 않는다.
 

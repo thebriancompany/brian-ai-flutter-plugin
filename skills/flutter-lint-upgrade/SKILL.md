@@ -28,12 +28,16 @@ dev_dependencies:
   very_good_analysis: ^x.y.z # 확인한 목표 버전으로 교체
 ```
 
-기본 캐럿 범위 예제:
+버전 정책별 예제:
 
 ```yaml
 # 호환 범위를 원하는 경우
 dev_dependencies:
-  very_good_analysis: ^10.0.0 # 캐럿은 호환 패치 버전을 허용한다.
+  very_good_analysis: ^10.0.0 # >=10.0.0 <11.0.0: 호환 minor·patch 버전을 허용한다.
+
+# 10.0.x의 patch 업데이트만 허용하는 경우
+dev_dependencies:
+  very_good_analysis: '>=10.0.0 <10.1.0'
 
 # 정확한 버전 고정을 요청한 경우
 dev_dependencies:
