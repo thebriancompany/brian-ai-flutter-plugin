@@ -37,6 +37,7 @@ class const AccessibleRatingBar({
 ## Cupertino 의미 정보 보완
 
 내장 역할·값을 확인하고 누락된 정보만 보완한다. 스위치·슬라이더를 일괄 button 역할로 바꾸지 않는다.
+자식을 `ExcludeSemantics`로 감싸지 않아 스위치의 탭과 슬라이더의 증가·감소 의미 동작을 보존한다.
 
 ```dart
 import 'package:flutter/cupertino.dart';
@@ -54,9 +55,7 @@ class const AccessibleCupertinoSwitch({
       label: label,
       toggled: value,
       enabled: true,
-      child: ExcludeSemantics(
-        child: CupertinoSwitch(value: value, onChanged: onChanged),
-      ),
+      child: CupertinoSwitch(value: value, onChanged: onChanged),
     );
   }
 }
@@ -75,13 +74,11 @@ class const AccessibleCupertinoSlider({
       label: label,
       value: value.toStringAsFixed(0),
       slider: true,
-      child: ExcludeSemantics(
-        child: CupertinoSlider(
-          value: value,
-          min: min,
-          max: max,
-          onChanged: onChanged,
-        ),
+      child: CupertinoSlider(
+        value: value,
+        min: min,
+        max: max,
+        onChanged: onChanged,
       ),
     );
   }
