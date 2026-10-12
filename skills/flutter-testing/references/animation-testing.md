@@ -46,7 +46,7 @@ testWidgets('card fades in when visible', (tester) async {
 
 ## 명시적 애니메이션
 
-프레임 시간을 진행해 동작을 검증한다.
+프레임 시간을 진행해 동작을 검증한다. 인수 없는 `pump()`는 가상 시계를 전진시키지 않으므로, 반복 애니메이션의 변화는 명시적인 `Duration`을 전달해 확인한다.
 
 ```dart
 testWidgets('spinner rotates continuously', (tester) async {
@@ -59,8 +59,8 @@ testWidgets('spinner rotates continuously', (tester) async {
     find.byType(Transform),
   );
 
-  // 한 프레임 진행
-  await tester.pump();
+  // 가상 시계를 약 한 프레임(16ms) 진행
+  await tester.pump(const Duration(milliseconds: 16));
 
   // 회전이 진행되었는지 검증
   final updatedTransform = tester.widget<Transform>(

@@ -622,23 +622,52 @@ class const AccessibleHero({required final Object tag, required final Widget chi
 
 ## 중복 입력 방지
 
+컨트롤러는 한 번 생성하고 위젯이 제거될 때 해제한다. `EmailChanged`가 입력을 그대로 상태에 반영할 때는 컨트롤러를 덮어쓰지 않아 선택 영역과 IME 조합 상태를 유지한다. 저장된 이메일 불러오기 등 외부 변경으로 텍스트가 달라졌을 때만 동기화한다.
+
 ```dart
-class CheckoutEmailField extends StatelessWidget {
+class CheckoutEmailField extends StatefulWidget {
   const CheckoutEmailField({super.key});
 
   @override
+  State<CheckoutEmailField> createState() => _CheckoutEmailFieldState();
+}
+
+class _CheckoutEmailFieldState extends State<CheckoutEmailField> {
+  late final TextEditingController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = TextEditingController(
+      text: context.read<CheckoutBloc>().state.email,
+    );
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return BlocBuilder<CheckoutBloc, CheckoutState>(
-      buildWhen: (prev, next) => prev.email != next.email,
-      builder: (context, state) {
-        return TextField(
-          controller: TextEditingController(text: state.email),
-          decoration: const InputDecoration(labelText: 'Email'),
-          keyboardType: TextInputType.emailAddress,
-          autofillHints: const [AutofillHints.email],
-          onChanged: (v) => context.read<CheckoutBloc>().add(EmailChanged(v)),
+    return BlocListener<CheckoutBloc, CheckoutState>(
+      listenWhen: (prev, next) => prev.email != next.email,
+      listener: (context, state) {
+        if (_controller.text == state.email) return;
+
+        _controller.value = TextEditingValue(
+          text: state.email,
+          selection: TextSelection.collapsed(offset: state.email.length),
         );
       },
+      child: TextField(
+        controller: _controller,
+        decoration: const InputDecoration(labelText: 'Email'),
+        keyboardType: TextInputType.emailAddress,
+        autofillHints: const [AutofillHints.email],
+        onChanged: (v) => context.read<CheckoutBloc>().add(EmailChanged(v)),
+      ),
     );
   }
 }
