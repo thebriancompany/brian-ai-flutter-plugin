@@ -107,7 +107,9 @@ class const SummaryCard({required final Summary? summary, super.key})
 ```dart
 TweenAnimationBuilder<double>(
   tween: Tween(begin: 0, end: isActive ? 1.0 : 0.0),
-  duration: Durations.medium2,
+  duration: MediaQuery.disableAnimationsOf(context)
+      ? Duration.zero
+      : Durations.medium2,
   curve: Easing.standard,
   builder: (context, value, child) {
     return Transform.scale(
@@ -126,6 +128,8 @@ TweenAnimationBuilder<double>(
 
 재생·정지·역재생·반복 또는 상태 감지가 필요하면 컨트롤러를 사용한다.
 
+다음 예제는 컨트롤러와 보간 설정을 마친 뒤 초기 진입 페이드를 재생한다. 외부 상태로 재생을 제어한다면 해당 트리거에서 `forward()`·`reverse()` 등을 호출한다.
+
 ```dart
 class _MyWidgetState extends State<MyWidget>
     with SingleTickerProviderStateMixin {
@@ -137,6 +141,7 @@ class _MyWidgetState extends State<MyWidget>
     super.initState();
     _controller = AnimationController(duration: Durations.medium2, vsync: this);
     _fadeAnimation = _controller.drive(CurveTween(curve: Easing.standard));
+    _controller.forward();
   }
 
   @override
