@@ -5,6 +5,7 @@
 ```dart
 import 'package:flutter/material.dart';
 import 'package:flutter/semantics.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
@@ -114,6 +115,11 @@ void main() {
   // --- C. 포커스와 키보드 ---
   group('Focus management', () {
     testWidgets('dialog traps focus', (tester) async {
+      final cancelFocus = FocusNode();
+      final confirmFocus = FocusNode();
+      addTearDown(cancelFocus.dispose);
+      addTearDown(confirmFocus.dispose);
+
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
@@ -121,9 +127,22 @@ void main() {
               builder: (context) => ElevatedButton(
                 onPressed: () => showDialog<void>(
                   context: context,
-                  builder: (_) => const AlertDialog(
-                    title: Text('Confirm'),
-                    content: Text('Are you sure?'),
+                  builder: (_) => AlertDialog(
+                    title: const Text('Confirm'),
+                    content: const Text('Are you sure?'),
+                    actions: [
+                      TextButton(
+                        focusNode: cancelFocus,
+                        autofocus: true,
+                        onPressed: () {},
+                        child: const Text('Cancel'),
+                      ),
+                      TextButton(
+                        focusNode: confirmFocus,
+                        onPressed: () {},
+                        child: const Text('OK'),
+                      ),
+                    ],
                   ),
                 ),
                 child: const Text('Open'),
@@ -136,8 +155,37 @@ void main() {
       await tester.tap(find.text('Open'));
       await tester.pumpAndSettle();
 
-      // 대화상자가 표시되고 포커스를 받는다.
       expect(find.text('Confirm'), findsOneWidget);
+
+      void expectDialogFocus(FocusNode expected) {
+        final primaryFocus = FocusManager.instance.primaryFocus;
+        expect(primaryFocus, same(expected));
+        expect(
+          primaryFocus!.context!.findAncestorWidgetOfExactType<AlertDialog>(),
+          isNotNull,
+        );
+      }
+
+      expectDialogFocus(cancelFocus);
+
+      // Tab으로 마지막 버튼을 지나도 대화상자 안에서 순환한다.
+      for (final expected in [confirmFocus, cancelFocus]) {
+        await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+        await tester.pumpAndSettle();
+        expectDialogFocus(expected);
+      }
+
+      // Shift+Tab으로 첫 버튼을 지나 역방향 순환도 검증한다.
+      await tester.sendKeyDownEvent(LogicalKeyboardKey.shiftLeft);
+      try {
+        for (final expected in [confirmFocus, cancelFocus]) {
+          await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+          await tester.pumpAndSettle();
+          expectDialogFocus(expected);
+        }
+      } finally {
+        await tester.sendKeyUpEvent(LogicalKeyboardKey.shiftLeft);
+      }
     });
 
     testWidgets('interactive elements are focusable', (tester) async {

@@ -40,7 +40,7 @@ testWidgets('redirects unauthenticated user to sign in', (tester) async {
     initialLocation: '/premium',
     redirect: (context, state) {
       // 미인증 상태 시뮬레이션
-      return '/sign-in';
+      return state.uri.path == '/sign-in' ? null : '/sign-in';
     },
     routes: [
       GoRoute(path: '/sign-in', builder: (_, __) => const SignInPage()),
