@@ -15,7 +15,7 @@
 
 ## Dart 3.13 생성자 규칙
 
-프로젝트 SDK와 설치한 린트 버전이 실제로 지원하는지 확인한다. 낮은 SDK에 새 문법을 적용하지 않는다.
+패키지 SDK 하한이 정한 언어 버전과 설치한 SDK·린트 버전이 실제로 지원하는지 확인한다. [Dart 생성자 문서](https://dart.dev/language/constructors)를 함께 확인한다. 낮은 SDK에 새 문법을 적용하지 않는다.
 
 - `unnecessary_type_name_in_constructor`: 클래스 본문의 이름 없는 생성자를 `new`로 표현한다. 반드시 기본 생성자 형태 전체로 바꿀 필요는 없다.
 - `use_declaring_parameters`: 이미 기본 생성자인 경우 `this.field`를 `final Type field` 같은 선언 매개변수로 바꾼다.

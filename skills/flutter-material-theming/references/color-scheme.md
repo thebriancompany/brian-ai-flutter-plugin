@@ -6,10 +6,10 @@ Material 3 색상 역할을 `ThemeData` 안에서 구성한다. 사용 가능한
 ThemeData(
   colorScheme: ColorScheme(
     brightness: Brightness.light,
-    primary: AppColors.primaryColor,
-    secondary: AppColors.secondaryColor,
-    error: AppColors.errorColor,
-    surface: AppColors.surfaceColor,
+    primary: brandPrimaryColor,
+    secondary: brandSecondaryColor,
+    error: brandErrorColor,
+    surface: brandSurfaceColor,
     onPrimary: Colors.white,
     onSecondary: Colors.white,
     onError: Colors.white,
@@ -18,40 +18,30 @@ ThemeData(
 )
 ```
 
-빠른 시제품은 `ColorScheme.fromSeed()`를 사용할 수 있다.
+`ColorScheme.fromSeed()`는 실제 제품에서도 사용할 수 있는 Material 3 구성 방식이다. 브랜드 요구에 맞춰 역할을 조정하고 실제 대비를 검증한다.
 
 ```dart
 ThemeData(
   colorScheme: ColorScheme.fromSeed(
-    seedColor: AppColors.primaryColor,
+    seedColor: brandPrimaryColor,
   ),
 )
 ```
 
 ## 밝은 테마와 어두운 테마
 
-한 `AppTheme`에서 두 색상 구성을 만든다.
+같은 테마 모듈에서 두 색상 구성을 만든다.
 
 ```dart
-class AppTheme {
-  static ThemeData get light => ThemeData(
-    colorScheme: ColorScheme(
-      brightness: Brightness.light,
-      primary: AppColors.primaryColor,
-      surface: AppColors.surfaceColor,
-      // 나머지 색상 역할
-    ),
-  );
+ThemeData get lightTheme =>
+    ThemeData(colorScheme: ColorScheme.fromSeed(seedColor: brandPrimaryColor));
 
-  static ThemeData get dark => ThemeData(
-    colorScheme: ColorScheme(
-      brightness: Brightness.dark,
-      primary: AppColors.primaryColorDark,
-      surface: AppColors.surfaceColorDark,
-      // 나머지 색상 역할
-    ),
-  );
-}
+ThemeData get darkTheme => ThemeData(
+  colorScheme: ColorScheme.fromSeed(
+    seedColor: brandPrimaryColor,
+    brightness: Brightness.dark,
+  ),
+);
 ```
 
 `MaterialApp`의 `theme`·`darkTheme`에 각각 전달한다.
@@ -65,10 +55,7 @@ Widget build(BuildContext context) {
 
   return ColoredBox(
     color: colorScheme.surface,
-    child: Text(
-      'Hello',
-      style: TextStyle(color: colorScheme.onSurface),
-    ),
+    child: Text('Hello', style: TextStyle(color: colorScheme.onSurface)),
   );
 }
 ```

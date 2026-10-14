@@ -9,7 +9,9 @@
 tags:
   unit:
   integration:
+    timeout: 4x
   golden:
+    timeout: 3x
 
 # 테스트별 기본 제한 시간
 timeout: 2x
@@ -20,19 +22,14 @@ platforms: [vm]
 # 동시 실행 테스트 묶음 수
 concurrency: 4
 
-# 태그별 재정의
-tag_overrides:
-  integration:
-    timeout: 4x
-  golden:
-    timeout: 3x
-
-# 파일·폴더별 재정의
+# 브라우저 실행 설정(dart test에서 Chrome을 선택했을 때)
 override_platforms:
   chrome:
     settings:
       headless: true
 ```
+
+Flutter 위젯 테스트는 flutter test의 지원 옵션을 따르며 위 `platforms: [vm]`은 순수 Dart 예제다. 태그별 설정은 `tags` 아래에 둔다. [공식 test 설정](https://github.com/dart-lang/test/blob/master/pkgs/test/doc/configuration.md)을 참고한다.
 
 ## 태그
 
@@ -40,20 +37,20 @@ override_platforms:
 
 ```dart
 // test/helpers/test_tags.dart
-abstract class TestTag {
-  static const unit = 'unit';
-  static const integration = 'integration';
-  static const golden = 'golden';
-}
+const unitTag = 'unit';
+const integrationTag = 'integration';
+const goldenTag = 'golden';
 ```
 
 파일 전체에 적용한다.
 
 ```dart
-@Tags([TestTag.integration])
+@Tags([integrationTag])
 library;
 
 import 'package:flutter_test/flutter_test.dart';
+
+import 'helpers/test_tags.dart';
 
 void main() {
   test('connects to remote service', () async {
@@ -65,7 +62,7 @@ void main() {
 개별 테스트에도 적용할 수 있다.
 
 ```dart
-test('renders correctly', tags: TestTag.golden, () {
+test('renders correctly', tags: goldenTag, () {
   // ...
 });
 ```

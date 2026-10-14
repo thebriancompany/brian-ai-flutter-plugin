@@ -7,6 +7,8 @@ description: "Flutter/Dart의 비밀값, 민감 정보, 인증, 네트워크, �
 
 Flutter/Dart 소스에서 비밀값·저장소·네트워크·인증·암호·로그·의존성 문제를 검토한다. [OWASP Mobile Top 10](https://owasp.org/www-project-mobile-top-10/)을 참고하며 침투 테스트나 실제 런타임 안전성 검증을 수행했다고 주장하지 않는다.
 
+공식 권고와 팀 관례의 구분, SDK·언어 버전, 오류·수명 처리는 [공통 기준](../flutter-review/SKILL.md#공식-기준과-프로젝트-관례)을 적용한다.
+
 ## 핵심 기준
 
 - 앱에 배포된 값은 추출될 수 있다. 비공개 서버 자격 증명을 소스·설정·에셋에 넣지 않는다.
@@ -37,22 +39,22 @@ Dart, `.env`, 네이티브 설정, `google-services.json`, plist·manifest를 �
 ```dart
 // ❌ 바이너리에서 추출할 수 있는 하드코딩된 비밀키
 const apiKey = 'sk-abc123';
-const mapboxToken = 'pk.your-token-here';
 
 // ❌ 빌드 시 주입: dart-define도 값을 클라이언트에 포함하므로
 // 추출 가능성을 없애지 않는다.
 const injectedKey = String.fromEnvironment('API_KEY');
 
-// ❌ 앱과 함께 배포되는 설정의 비밀값
-// google-services.json:
-// "api_key": [{ "current_key": "AIzaSy..." }]
+// 공개 식별용 Firebase API 키는 존재만으로 비밀 유출이 아니다.
+// 실제 서비스 권한·API 제한·Security Rules를 별도로 확인한다.
 ```
+
+Firebase 클라이언트 API 키와 Mapbox 공개 토큰은 용도·권한·제한 설정으로 판단한다. [Firebase 키 안내](https://firebase.google.com/docs/projects/api-keys)를 참고하고 서버 비밀과 혼동하지 않는다.
 
 다음은 런타임 자격 증명 흐름의 예제다. 서버의 장기 비밀을 그대로 내려주는 설계는 해결책이 아니다. 사용자별 단기 토큰 또는 서버 프록시로 대체한다.
 
 ```dart
 // 서버 런타임 흐름 예: 장기 비밀 대신 사용자별 단기 토큰을 사용한다.
-final apiKey = await secretsService.fetchApiKey();
+final accessToken = await authService.fetchShortLivedAccessToken();
 ```
 
 | 이동 방법 | 해결되지 않는 이유 |
@@ -111,7 +113,6 @@ final dio = Dio(BaseOptions(baseUrl: 'https://api.example.com'));
 서버가 요청마다 토큰과 권한을 확인해야 한다. 민감한 앱 흐름의 생체 인증은 `local_auth` 같은 검증된 플랫폼 추상화를 사용한다.
 
 ```dart
-import 'package:flutter/services.dart';
 import 'package:local_auth/local_auth.dart';
 
 class BiometricGate {
@@ -126,15 +127,17 @@ class BiometricGate {
 
       return await _auth.authenticate(
         localizedReason: 'Confirm your identity to continue to payments',
-        options: const AuthenticationOptions(biometricOnly: true),
+        biometricOnly: true,
       );
-    } on PlatformException {
+    } on LocalAuthException {
       // 등록된 생체 정보가 없거나 실패가 누적되면 접근을 허용하지 않는다.
       return false;
     }
   }
 }
 ```
+
+이 예제는 [local_auth 3.x](https://pub.dev/packages/local_auth/changelog)의 직접 옵션·LocalAuthException API다. 2.x 프로젝트는 해당 버전의 AuthenticationOptions·PlatformException을 유지하고 예제 때문에 업그레이드하지 않는다. 인증 안내 문구는 앱 지역화에서 전달한다.
 
 생체 인증은 로컬 접근 제어이며 결제 등 서버 권한 확인을 대신하지 않는다. 기존 인증 제공자와 인증 설계를 존중한다.
 
@@ -160,6 +163,7 @@ const encryptionKey = 'my-secret-key-123';
 // ✅ 보안용 Random.secure()로 최소 16바이트(128비트)를 생성한다.
 import 'dart:convert';
 import 'dart:math';
+
 import 'package:crypto/crypto.dart';
 
 final secureRandom = Random.secure();
@@ -253,11 +257,11 @@ catch (e) {
 
 ```dart
 // ✅ 민감하지 않은 식별자만 기록
-debugPrint('Login attempt for userId: ${user.id}');
+debugPrint('Login attempt started'); // 사용자 식별자도 개인정보일 수 있다.
 
 // ✅ UI에 보여 줄 오류 메시지 정제
-catch (e, stackTrace) {
-  log('Login failed', error: e, stackTrace: stackTrace); // 오류 수집에도 민감 정보를 제거한다.
+on AuthException catch (e, stackTrace) {
+  reportSanitizedAuthFailure(e, stackTrace); // 앱의 민감 정보 제거 헬퍼
   emit(state.copyWith(status: LoginStatus.failure)); // UI에는 일반 오류 메시지 표시
 }
 ```

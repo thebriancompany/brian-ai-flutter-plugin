@@ -5,18 +5,20 @@ description: "Flutter 앱의 패키지·폴더 배치, 데이터·저장소·Blo
 
 # 계층형 Flutter 아키텍처
 
-데이터, 저장소, 비즈니스 로직, 화면의 네 계층을 단방향으로 연결한다. 새 구조를 설계하거나 기존 계층 경계를 수정할 때 사용하며, 요청하지 않은 앱 전체 재구성은 하지 않는다.
+이 스킬은 데이터, 저장소, Bloc/Cubit, 화면의 네 계층을 선택한 앱의 구현 예제다. 공식 지침의 UI·데이터 분리와 단방향 흐름을 구현하는 한 방식이며 Bloc이나 네 계층 자체가 공식 필수 구조는 아니다. 새 구조를 설계하거나 기존 계층 경계를 수정할 때 사용하며, 요청하지 않은 앱 전체 재구성은 하지 않는다.
+
+공식 권고와 팀 관례의 구분, SDK·언어 버전, 오류·수명 처리는 [공통 기준](../flutter-review/SKILL.md#공식-기준과-프로젝트-관례)을 적용한다.
 
 ## 핵심 기준
 
 - 의존 방향은 화면 → 비즈니스 로직 → 저장소 → 데이터다.
-- 데이터·저장소는 각각 `pubspec.yaml`을 가진 `packages/`의 독립 Dart 패키지에 둔다. 비즈니스 로직·화면은 앱 `lib/`의 기능별 폴더에 둔다.
-- 데이터 패키지는 외부 통신만 담당하며 도메인 규칙을 포함하지 않는다. 데이터·저장소 패키지는 Flutter SDK에 의존하지 않는다.
-- 저장소는 도메인별로 나누고 서로 직접 의존하지 않는다. 필요한 조합은 비즈니스 로직에서 처리한다.
+- 재사용·별도 테스트·의존 경계의 이점이 있을 때 데이터·저장소를 독립 패키지로 나눈다. 작은 앱에서는 lib 안의 폴더 분리로 충분하다. 아래 packages 구조는 모노레포 예제다.
+- 데이터 클라이언트는 외부 통신, 저장소는 데이터 관련 도메인 규칙·캐시·원천 조합을 담당한다. 가능하면 순수 Dart로 유지하되 shared_preferences 같은 Flutter 플러그인 어댑터에는 Flutter SDK 의존성을 선언한다.
+- 저장소는 도메인별로 나누고 서로 직접 의존하지 않는다. 여러 저장소 조합은 Bloc/Cubit에서 처리하고 복잡하거나 반복될 때만 별도 use-case 계층을 둔다. 교체·테스트 경계가 필요하면 저장소 인터페이스와 구현을 분리한다.
 - 로컬 패키지는 `path:` 의존성을 사용한다. 공개 API는 배럴로 내보내고 소비자가 `src/`를 직접 가져오지 않게 한다.
 - 저장소가 사용하는 모든 외부 데이터 원천을 생성자로 주입한다. SDK 싱글턴도 부트스트랩에서 만들거나 얻어 전달한다.
 - 앱 진입점·부트스트랩만 데이터 패키지를 직접 가져온다. Bloc·위젯·앱 테스트는 저장소를 통해 접근한다.
-- Dart 3.13 이상이면 기본 생성자의 선언 매개변수를 사용한다. 이전 SDK에서는 호환 문법을 유지한다.
+- 패키지 언어 버전이 Dart 3.13 이상이고 생성 도구도 지원하면 기본 생성자의 선언 매개변수를 사용할 수 있다. 기존 문법도 유효하며 스타일만으로 일괄 변환하지 않는다.
 - 생성·의존성·테스트는 연결된 MCP의 실제 스키마를 확인해 사용하거나 `very_good create dart_package`, `very_good packages get`, `very_good test` CLI로 수행한다.
 
 ## 계층별 책임
@@ -52,7 +54,7 @@ description: "Flutter 앱의 패키지·폴더 배치, 데이터·저장소·Blo
 
 ## 모노레포 배치
 
-기능마다 bloc/cubit과 view를 나누고 배럴을 둔다. 데이터 원천과 저장소마다 별도 패키지를 만든다.
+아래는 별도 패키지 분리가 필요한 경우의 배치다. 기능마다 bloc/cubit과 view를 나누고 공개 API만 배럴로 내보낸다.
 
 ```text
 my_app/
@@ -108,14 +110,19 @@ my_app/
 /// 사용자 API용 HTTP 클라이언트.
 class UserApiClient {
   // http.Client 주입: 테스트는 목, 실제 앱은 실제 클라이언트 사용
-  UserApiClient({
-    required String baseUrl,
-    http.Client? httpClient,
-  })  : _baseUrl = baseUrl,
-        _httpClient = httpClient ?? http.Client();
+  UserApiClient({required String baseUrl, http.Client? httpClient})
+    : _baseUrl = baseUrl,
+      _httpClient = httpClient ?? http.Client(),
+      _ownsHttpClient = httpClient == null;
 
   final String _baseUrl;
   final http.Client _httpClient;
+  final bool _ownsHttpClient;
+
+  /// 주입된 클라이언트는 호출자가, 내부 생성 클라이언트는 이 객체가 해제한다.
+  void close() {
+    if (_ownsHttpClient) _httpClient.close();
+  }
 
   /// 모든 메서드는 타입이 있는 응답 모델을 반환한다.
   Future<UserResponse> getUser(String userId) async {
@@ -136,7 +143,7 @@ class UserApiClient {
 
 ## 저장소 계층
 
-응답 모델을 앱의 도메인 모델로 변환한다. 도메인 모델은 저장소 패키지에 둔다. 외부 원천이 없는 메모리 상태 저장소는 불필요한 생성자 인수를 받을 필요가 없다.
+외부 스키마와 앱 요구가 다르면 응답 모델을 도메인 모델로 변환한다. 작은 앱에 동일한 모델을 중복 생성하지 않는다. 이 예제의 도메인 모델은 저장소 패키지에 둔다. 외부 원천이 없는 메모리 상태 저장소는 불필요한 생성자 인수를 받을 필요가 없다.
 
 ```dart
 /// 도메인 모델은 데이터가 아닌 저장소 패키지에 둔다.
@@ -155,9 +162,8 @@ class const User({
 ```dart
 /// 저장소는 데이터 클라이언트를 직접 만들지 않고 주입받는다.
 class UserRepository {
-  const UserRepository({
-    required UserApiClient userApiClient,
-  }) : _userApiClient = userApiClient;
+  const UserRepository({required UserApiClient userApiClient})
+    : _userApiClient = userApiClient;
 
   final UserApiClient _userApiClient;
 
@@ -230,12 +236,7 @@ void main() {
   final authRepository = AuthRepository(authApiClient: authApiClient);
   final userRepository = UserRepository(userApiClient: userApiClient);
 
-  runApp(
-    App(
-      authRepository: authRepository,
-      userRepository: userRepository,
-    ),
-  );
+  runApp(App(authRepository: authRepository, userRepository: userRepository));
 }
 ```
 
@@ -248,11 +249,13 @@ void main() {
 | 데이터 패키지에 도메인 모델 | 응답 모델과 도메인 모델 분리 |
 | 저장소가 모든 비즈니스 규칙 처리 | 데이터 조합·변환과 상태 규칙 분리 |
 | 로컬 패키지에 git/pub 버전 의존 | path 의존 |
-| 데이터·저장소에 Flutter import | 순수 Dart 패키지 |
+| 도메인 로직이 Flutter UI에 결합 | 순수 Dart로 분리, 플랫폼 어댑터의 Flutter 의존은 허용 |
 | 거대한 단일 저장소 | 도메인별 저장소 |
 | src 직접 import | 공개 배럴 |
 
 ## 작업 절차
+
+아래는 독립 패키지와 Bloc을 채택한 프로젝트 절차다. 폴더 분리만 필요한 앱에서는 같은 책임을 기존 lib 안에 배치한다.
 
 ### 데이터 원천 추가
 

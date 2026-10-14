@@ -29,12 +29,14 @@ Future<void> _onDataRequested(
   try {
     final data = await _repository.fetchData();
     emit(state.copyWith(status: DataStatus.success, data: data));
-  } catch (error, stackTrace) {
+  } on Exception catch (error, stackTrace) {
     addError(error, stackTrace);
-    emit(state.copyWith(status: DataStatus.failure, error: '$error'));
+    emit(state.copyWith(status: DataStatus.failure, error: 'load_failed'));
   }
 }
 ```
+
+`addError`의 관찰자·로그는 민감 정보를 제거한다. 상태에는 안정적인 오류 코드만 넣고 화면에서 지역화한다. 예상 밖 프로그래밍 오류를 일반 실패 상태로 삼키지 않는다.
 
 ## 이벤트 변환기
 
@@ -45,11 +47,11 @@ import 'package:bloc_concurrency/bloc_concurrency.dart';
 
 class SearchBloc extends Bloc<SearchEvent, SearchState> {
   SearchBloc({required SearchRepository repository})
-      : _repository = repository,
-        super(const SearchState()) {
+    : _repository = repository,
+      super(const SearchState()) {
     on<SearchTermChanged>(
       _onSearchTermChanged,
-      transformer: restartable(),  // 새 이벤트가 들어오면 진행 중인 처리를 취소한다.
+      transformer: restartable(), // 이전 핸들러의 방출을 취소한다. HTTP 요청 자체는 별도 취소가 필요하다.
     );
   }
 }
@@ -62,9 +64,11 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
 | `droppable()` | 처리 중 들어오는 새 이벤트 무시 |
 | `restartable()` | 현재 처리를 취소하고 최신 이벤트 처리 |
 
+변환기는 같은 `on<Event>` 등록의 이벤트에 적용된다. 서로 다른 이벤트 타입 전체를 직렬화하지 않는다. `restartable`도 외부 Future·서버 쓰기를 되돌리지 않으며 비동기 완료 후 `emit.isDone`을 확인한다.
+
 ## 단일 상태 클래스
 
-데이터 형태가 같으면 상태 열거형과 하나의 클래스를 사용한다. `copyWith`로 전이를 간결하게 표현한다.
+데이터 형태가 같으면 상태 열거형과 하나의 클래스를 사용한다. `final`만으로 List 내용은 불변이 되지 않아 복사해 보관하며 Todo 자체도 불변이어야 한다. `copyWith(clearError: true)`는 이전 오류를 지운다. 컬렉션을 동결하므로 이 예제의 생성자는 const가 아니다.
 
 | 필드 | 타입 | 용도 |
 | --- | --- | --- |
@@ -75,20 +79,26 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
 ```dart
 enum TodoListStatus { initial, loading, success, failure }
 
-class const TodoListState({
-  final TodoListStatus status = TodoListStatus.initial,
-  final List<Todo> todos = const [],
-  final String? error,
-}) extends Equatable {
+class TodoListState extends Equatable {
+  TodoListState({
+    this.status = TodoListStatus.initial,
+    List<Todo> todos = const [],
+    this.error,
+  }) : todos = List.unmodifiable(todos);
+
+  final TodoListStatus status;
+  final List<Todo> todos;
+  final String? error;
   TodoListState copyWith({
     TodoListStatus? status,
     List<Todo>? todos,
     String? error,
+    bool clearError = false,
   }) {
     return TodoListState(
       status: status ?? this.status,
       todos: todos ?? this.todos,
-      error: error ?? this.error,
+      error: clearError ? null : (error ?? this.error),
     );
   }
 

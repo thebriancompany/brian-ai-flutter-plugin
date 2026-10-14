@@ -52,3 +52,36 @@
 설치된 Codex CLI에 일회성 `marketplaces` 설정을 전달한 읽기 전용 조회에서 `brian-ai-flutter-plugin@brian-flutter-local`, 버전 `0.1.0`이 `available`로 표시되는 것을 확인했습니다. 이 확인은 개인 설정을 저장하거나 플러그인을 설치·활성화하지 않습니다.
 
 이 검증은 모든 예제를 실제 Flutter 앱에서 컴파일하거나 보조 기술·MCP 서버를 실행한 결과가 아닙니다. 예제는 앱별 타입·지역화·SDK·패키지 설정에 맞춰 통합하고 해당 프로젝트에서 분석·테스트해야 합니다.
+
+## 2026-10-14 공식 지침 대조와 예제 수정
+
+스킬 16개와 참고 문서 52개를 검토했습니다. 계층 분리·주입·테스트·접근성의 기본 방향은 유지하고, 공식 권고와 팀 관례의 혼동 및 예제의 구체적 오류를 수정했습니다. 위의 원본 코드 보존 수치는 초기 이식 당시의 기록이며 이번 수정 이후 코드 동일성을 의미하지 않습니다. import-manifest의 원본 해시는 출처 기록으로 보존합니다.
+
+| 영역 | 발견과 조치 |
+| --- | --- |
+| 공통·리뷰 | 네 분야만 보던 리뷰에 Effective Dart와 관련 Flutter 분야의 기준을 추가. 오류·수명·불변성·import·언어 버전과 권고 강도를 구분 |
+| Bloc | 모든 테스트에 blocTest·모킹·Equatable을 강제하던 규칙 완화. Cubit 구독과 Bloc Emitter 수명을 구분. 리스트 방어적 복사와 오류 초기화가 가능한 copyWith로 수정 |
+| 계층 | 모든 원천을 순수 Dart 독립 패키지로 강제하지 않음. SharedPreferences 어댑터의 Flutter 의존성·초기화, HTTP 소유권·해제, 도메인 예외 변환 보완 |
+| 전체 예제 | Dart 3.11 하한과 충돌하던 primary constructor를 일반 생성자로 변경. 미정의 부트스트랩 변형을 제거하고 Provider 해제 연결. Bloc 9와 함께 사용하는 bloc_test 예제를 10으로 정합화 |
+| 생성 | very_good 템플릿과 공식 flutter create·dart create를 구분. Flutter 플러그인 의존 패키지를 순수 Dart로 만들지 않도록 보완 |
+| 품질 검사 | 목표가 없을 때 100%를 새 통과 조건으로 부과하지 않음. 기존 CI 기준과 커버리지 측정값을 구분 |
+| 테스트 | fake·mock 선택, main 수준 setup, 실제 Bloc을 사용하는 위젯 테스트의 분류 정정. 존재하지 않는 tag_overrides 제거. static 태그 클래스 대신 최상위 상수 사용. 잘못된 thenReturn 호출 수정 |
+| 애니메이션 | 없는 Easing.emphasized를 지원 곡선으로 교체. 빌더에서 CurvedAnimation 리스너를 만들지 않도록 CurveTween 사용. 목록 인덱스·부모 애니메이션 변경을 반영. 모션 감소와 const 자식 재빌드 설명 보완 |
+| Material·UI | static 전용 토큰·테마 클래스 예제를 최상위 선언으로 변경하고 ThemeExtension 인스턴스 패턴 유지. 테마 Data API 갱신, fromSeed를 시제품 전용으로 제한하지 않음. 재노출·파일 분리·다크 모드의 적용 범위 명시 |
+| 내비게이션 | builder 4.x 공개 믹스인 및 3.x와의 차이, part 설정, 최상위 절대 경로와 중첩 URL 정합성 보완. 실제 라우터 테스트에 dispose 추가 |
+| 지역화 | context.l10n은 편의 확장임을 명시. nullable-getter 설정과 확장 타입 일치, 테스트의 supportedLocales 누락 보완 |
+| 접근성 | 존재하지 않는 MediaQueryData.accessibilityFeatures 제거. 확대·모션 테스트가 실제 속성을 검증하도록 수정. 키보드 활성화 검증, 아이콘 그림과 조작 영역 구분, 대비 수치 재계산, 최신 announcement API 반영 |
+| 정적 보안 | 공개 Firebase 키를 서버 비밀과 구분. local_auth 3.x API와 2.x 호환 범위 명시. 로그의 사용자 식별자·원시 예외 노출 예제 정리. 별도 핀 검사와 실제 요청 보호 구분 |
+| SDK·린트 업그레이드 | 기존 최소 변경·버전 확인 절차 유지. 새 문법의 언어 버전 확인과 공통 공식 기준 연결 |
+| 라이선스 | 실제 해결 버전·원문·배포 조건을 확인하고 자동 법률 보증을 하지 않는 기존 범위 유지. 공통 기준 연결 |
+
+대조한 주요 1차 자료:
+
+- [Effective Dart](https://dart.dev/effective-dart), [Usage](https://dart.dev/effective-dart/usage), [Design](https://dart.dev/effective-dart/design), [Primary constructors](https://dart.dev/language/primary-constructors)
+- [Flutter architecture recommendations](https://docs.flutter.dev/app-architecture/recommendations), [Performance best practices](https://docs.flutter.dev/perf/best-practices), [Testing overview](https://docs.flutter.dev/testing/overview)
+- [MediaQueryData](https://api.flutter.dev/flutter/widgets/MediaQueryData-class.html), [Easing](https://api.flutter.dev/flutter/material/Easing-class.html), [CurvedAnimation.dispose](https://api.flutter.dev/flutter/animation/CurvedAnimation/dispose.html), [테마 정규화](https://docs.flutter.dev/release/breaking-changes/component-theme-normalization)
+- [test 설정](https://github.com/dart-lang/test/blob/master/pkgs/test/doc/configuration.md), [go_router_builder 변경 기록](https://pub.dev/packages/go_router_builder/changelog), [local_auth 변경 기록](https://pub.dev/packages/local_auth/changelog), [Firebase 키](https://firebase.google.com/docs/projects/api-keys)
+
+검증은 저장소 구조·설치·배포 검사와 별도 임시 Flutter 프로젝트의 핵심 예제 실행으로 나눕니다. Flutter 3.47.1 / Dart 3.13.1에서 접근성 예제 11개, 상태의 불변성·오류 초기화 2개, 목록 애니메이션 갱신 1개, 컴포넌트 테마 구성 1개로 총 15개 테스트와 해당 임시 프로젝트의 정적 분석이 통과했습니다. 저장소 구조 검사, 16개 스킬의 기본 검증, 설치·배포 테스트 9개와 ZIP 생성도 통과했습니다. 문서에서 해당 코드 블록을 추출하고 필요한 테스트용 모델과 import를 붙여 실행했습니다. 파싱 가능한 Dart 코드 블록 117개는 dart format으로 정리했으며 이는 타입 검사와 별개입니다.
+
+이 결과는 전체 코드 조각의 컴파일 보증, go_router·JSON 생성기의 모든 버전 검증, 네이티브 생체 인증·화면 낭독 실행, WCAG 적합성 인증을 뜻하지 않습니다. 구문 포맷 검증과 실제 타입·동작 검증도 구분합니다. 예제 버전을 최신값으로 간주하거나 이 자료 전체가 공식 인증을 받았다고 표현하지 않습니다.

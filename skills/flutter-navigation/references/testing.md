@@ -3,6 +3,7 @@
 ## 위젯 테스트용 GoRouter 모킹
 
 ```dart
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mocktail/mocktail.dart';
@@ -19,10 +20,7 @@ void main() {
   testWidgets('navigates to details on tap', (tester) async {
     await tester.pumpWidget(
       MaterialApp(
-        home: InheritedGoRouter(
-          goRouter: mockRouter,
-          child: const HomePage(),
-        ),
+        home: InheritedGoRouter(goRouter: mockRouter, child: const HomePage()),
       ),
     );
 
@@ -48,6 +46,7 @@ testWidgets('redirects unauthenticated user to sign in', (tester) async {
     ],
   );
 
+  addTearDown(router.dispose);
   await tester.pumpWidget(
     MaterialApp.router(routerConfig: router),
   );

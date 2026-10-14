@@ -7,15 +7,17 @@ description: "Dart 단위 테스트, Flutter 위젯·골든 테스트를 작성�
 
 프로젝트의 테스트 관례를 확인하고 아래 패턴을 적용한다. Bloc/Cubit 자체 테스트는 [Bloc](../flutter-bloc/SKILL.md), UI 패키지 위젯은 [UI 패키지](../flutter-ui-package/SKILL.md)를 우선 참고한다.
 
+공식 권고와 팀 관례의 구분, SDK·언어 버전, 오류·수명 처리는 [공통 기준](../flutter-review/SKILL.md#공식-기준과-프로젝트-관례)을 적용한다.
+
 ## 핵심 기준
 
 - `'works'` 같은 이름 대신 관찰 가능한 동작을 설명한다. 클래스 → 메서드 → 동작 순서의 `group` 계층을 만든다.
 - 타입 이름은 `'returns $User'`처럼 보간해 이름 변경이 반영되게 한다.
-- 모킹은 `mocktail`을 기본으로 하고 파일별 `_MockX` 비공개 클래스를 쓴다.
-- `setUp`·`tearDown` 등은 `group` 안에 둔다. 변경 가능한 객체는 `late` 선언 후 매 테스트의 `setUp`에서 새로 만든다.
+- 간단한 fake로 동작을 표현할 수 있는지 먼저 검토한다. 호출 스텁·검증에는 기존 모킹 도구를 따르고, 아래 mocktail 예제에서는 파일별 `_MockX`를 쓴다.
+- `setUp`·`tearDown`은 필요한 범위에 둔다. main 안의 공통 setup도 유효하며 group 중첩은 격리의 필수 조건이 아니다. 가변 객체는 매 테스트마다 새로 만든다.
 - 정적·전역 가변 상태나 파일 간 공유 목으로 순서 의존성을 만들지 않는다.
-- 테스트 태그는 `TestTag`의 `static const`로 정의한다. 모든 골든 테스트에 `TestTag.golden`을 지정한다.
-- 위젯 테스트는 동작·콜백·내용·이동을 검증한다. 정적 시각 속성은 골든 테스트로 검증한다.
+- 반복 사용하는 테스트 태그는 최상위 const로 정의할 수 있다. 골든 테스트에는 golden 태그를 지정해 선택 실행할 수 있게 한다.
+- 위젯 테스트는 동작·콜백·내용·이동을 검증한다. 시각 회귀는 골든으로, 접근성 대상 크기·모션 감소 시간 등 명확한 속성 계약은 직접 assertion으로 검증할 수 있다.
 - `test/helpers/pump_app.dart`의 공유 `pumpApp`으로 테마·지역화를 구성한다.
 - 연결된 테스트 MCP가 있으면 도구 스키마를 확인하고 사용한다. 없으면 해당 패키지에서 `very_good test`, `flutter test`, `dart test` 중 프로젝트에 맞는 CLI를 실행한다. MCP 전용 훅을 전제하지 않는다.
 - 모노레포에서는 반드시 대상 패키지 디렉터리를 지정한다. 도구의 `timeout_seconds`가 있으면 사용하고, CLI의 테스트별 제한과 실행 프로세스 전체 제한은 구분한다. `--help`에 없는 옵션을 추정해서 전달하지 않는다.
@@ -79,7 +81,7 @@ void main() {
 
 | 문제 | 개선 |
 | --- | --- |
-| main 최상위 setUp | group 내부로 이동 |
+| 여러 테스트가 같은 가변 객체 재사용 | 매 테스트 setUp 또는 테스트 본문에서 새로 생성 |
 | 최상위 final 목 인스턴스 | late 선언과 setUp 생성 |
 | 여러 파일이 가져오는 공개 목 | 파일별 비공개 목 |
 | static·global 가변 값 | 제거하거나 매번 초기화 |
@@ -103,7 +105,7 @@ test('normalizes email to lowercase before saving', () async {
 
 - `testWidgets`를 사용한다. 기본 탐색은 `find.byType`, 사용자에게 보이는 문구는 `find.text`, 모호한 경우에만 키를 쓴다.
 - 렌더링·이동·호출·갱신 같은 동작별로 그룹을 나눈다.
-- 격리된 위젯 테스트에는 `MockBloc`·`MockCubit`을 주입한다. 실제 Bloc이 필요한 경우는 통합 테스트임을 구분한다.
+- 격리하려는 경계에 따라 fake·`MockBloc`·`MockCubit` 또는 실제 Bloc을 주입한다. 실제 Bloc을 사용해도 `testWidgets`에서 실행하면 위젯 테스트이며, 기기에서 앱 전체를 검증하는 integration_test와 구분한다.
 - 유한한 프레임 진행에는 `pump()`를 우선한다. 반복 애니메이션에는 `pumpAndSettle()`을 쓰지 않는다.
 
 공통 앱 구성을 헬퍼에 둔다.
@@ -112,11 +114,7 @@ test('normalizes email to lowercase before saving', () async {
 // test/helpers/pump_app.dart
 extension PumpApp on WidgetTester {
   Future<void> pumpApp(Widget widget) {
-    return pumpWidget(
-      MaterialApp(
-        home: widget,
-      ),
-    );
+    return pumpWidget(MaterialApp(home: widget));
   }
 }
 ```
@@ -137,7 +135,7 @@ void main() {
 }
 ```
 
-탭·입력 뒤에 프레임을 진행시키고 검증한다. 패딩·색·글자 크기의 직접 검증을 동작 테스트에 섞지 않는다.
+탭·입력 뒤에 프레임을 진행시키고 검증한다. 내부 구현 세부사항의 무의미한 고정은 피하되 명시된 크기·테마·접근성 계약은 직접 검증한다.
 
 ## 참고 문서
 

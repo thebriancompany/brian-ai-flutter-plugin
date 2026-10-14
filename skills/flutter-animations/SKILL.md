@@ -7,15 +7,18 @@ description: "Flutter 애니메이션·모션·화면 전환을 구현하거나 
 
 Flutter 내장 애니메이션과 Material 3 모션을 다룬다. Lottie·Rive 전용 작업에는 별도 지침이 필요하다.
 
+공식 권고와 팀 관례의 구분, SDK·언어 버전, 오류·수명 처리는 [공통 기준](../flutter-review/SKILL.md#공식-기준과-프로젝트-관례)을 적용한다.
+
 ## 핵심 기준
 
 - 시각적 의도가 불명확하면 바뀔 속성, 트리거, 시간, 곡선 중 필요한 정보만 확인한다. 충분한 사양이 있으면 바로 구현한다.
 - 목표 값으로 이동하는 동작은 암시적 애니메이션을 기본으로 한다. 재생·정지·역재생·반복 또는 시간차 제어가 필요할 때 컨트롤러를 쓴다. 사용자가 구현 방식을 지정했다면 그 선택을 존중하고 필요한 절충점을 설명한다.
-- 새 모션은 `Durations`와 `Easing` 토큰을 사용한다. 명시적인 디자인 사양이 있으면 그 값을 이름 있는 상수로 관리한다.
-- 여러 기능에서 쓰는 시간·곡선·오프셋은 `AppMotion` 등에 모은다.
+- Material 모션은 `Durations`와 `Easing` 토큰을 우선한다. Cupertino나 기존 디자인 시스템의 모션은 그 규칙을 따른다. 명시적인 디자인 사양이 있으면 그 값을 이름 있는 상수로 관리한다.
+- 여러 기능에서 쓰는 시간·곡선·오프셋은 모션 모듈의 최상위 상수 등에 모은다.
 - 소유한 `AnimationController`는 `super.dispose()` 전에 해제한다. 하나면 `SingleTickerProviderStateMixin`, 여러 개면 `TickerProviderStateMixin`을 쓴다.
 - 애니메이션 빌더에는 바뀌는 하위 트리만 넣는다. 위치·크기의 시각적 변화는 가능한 한 `Transform`을 활용한다. `width`, `height`, `padding`의 매 프레임 변경은 레이아웃 비용을 유발하므로 실제 레이아웃 변화가 필요할 때만 쓴다.
-- Dart 3.13 이상이면 기본 생성자의 선언 매개변수를 사용하고, 이전 버전에서는 호환 문법을 유지한다.
+- 패키지 언어 버전이 Dart 3.13 이상이면 기본 생성자를 사용할 수 있다. 이전 언어 버전과 기존 프로젝트 관례에서는 호환 생성자 문법을 유지한다.
+- `MediaQuery.disableAnimationsOf(context)`를 반영한다. 암시적 동작은 시간을 줄이거나 0으로, 장식적 반복 동작은 정지시킨다. 내장 AnimationBehavior만으로 반복 모션이 모두 꺼진다고 가정하지 않는다. 설정 변경은 didChangeDependencies에서 반영하고 구체적 접근성 검증은 [접근성](../flutter-accessibility/SKILL.md)을 참고한다.
 
 ## 선택 기준
 
@@ -49,23 +52,21 @@ AnimatedContainer(
 )
 ```
 
-여러 기능이 공유할 때 `AppMotion`으로 묶는다. 한 곳뿐이면 토큰을 직접 참조해도 된다.
+여러 기능이 공유할 때 모션 모듈로 묶는다. 한 곳뿐이면 토큰을 직접 참조해도 된다.
 
 ```dart
-abstract class AppMotion {
-  // 일반 전환
-  static const Duration standardDuration = Durations.medium2;
-  static const Curve standardCurve = Easing.standard;
+// 일반 전환
+const Duration motionStandardDuration = Durations.medium2;
+const Curve motionStandardCurve = Easing.standard;
 
-  // 화면 전환
-  static const Duration pageDuration = Durations.medium4;
-  static const Curve pageEnterCurve = Easing.emphasizedDecelerate;
-  static const Curve pageExitCurve = Easing.emphasizedAccelerate;
+// 화면 전환
+const Duration motionPageDuration = Durations.medium4;
+const Curve motionPageEnterCurve = Easing.emphasizedDecelerate;
+const Curve motionPageExitCurve = Easing.emphasizedAccelerate;
 
-  // 페이드
-  static const Duration fadeDuration = Durations.short3;
-  static const Curve fadeCurve = Easing.standard;
-}
+// 페이드
+const Duration motionFadeDuration = Durations.short3;
+const Curve motionFadeCurve = Easing.standard;
 ```
 
 ## 암시적 애니메이션
@@ -78,14 +79,17 @@ class const SummaryCard({required final Summary? summary, super.key})
   @override
   Widget build(BuildContext context) {
     final hasData = summary != null;
+    final duration = MediaQuery.disableAnimationsOf(context)
+        ? Duration.zero
+        : Durations.medium2;
 
     return AnimatedOpacity(
       opacity: hasData ? 1 : 0,
-      duration: Durations.medium2,
+      duration: duration,
       curve: Easing.standard,
       child: AnimatedSlide(
         offset: hasData ? Offset.zero : const Offset(0, 0.1),
-        duration: Durations.medium2,
+        duration: duration,
         curve: Easing.emphasizedDecelerate,
         child: Card(child: _SummaryContents(summary: summary)),
       ),
@@ -131,14 +135,8 @@ class _MyWidgetState extends State<MyWidget>
   @override
   void initState() {
     super.initState();
-    _controller = AnimationController(
-      duration: Durations.medium2,
-      vsync: this,
-    );
-    _fadeAnimation = CurvedAnimation(
-      parent: _controller,
-      curve: Easing.standard,
-    );
+    _controller = AnimationController(duration: Durations.medium2, vsync: this);
+    _fadeAnimation = _controller.drive(CurveTween(curve: Easing.standard));
   }
 
   @override
@@ -152,12 +150,9 @@ class _MyWidgetState extends State<MyWidget>
     return AnimatedBuilder(
       animation: _fadeAnimation,
       builder: (context, child) {
-        return Opacity(
-          opacity: _fadeAnimation.value,
-          child: child,
-        );
+        return Opacity(opacity: _fadeAnimation.value, child: child);
       },
-      child: child, // 정적 자식은 매 프레임 재빌드하지 않는다.
+      child: widget.child, // State 예제: 위젯이 제공하는 정적 자식이다.
     );
   }
 }
@@ -167,30 +162,32 @@ class _MyWidgetState extends State<MyWidget>
 
 ### Interval로 시간차 주기
 
-하나의 컨트롤러에서 `CurvedAnimation`의 `Interval`로 시작 구간을 나눈다. 같은 시점에 목표 값으로 움직이는 여러 속성과 구분한다.
+하나의 컨트롤러에서 `CurveTween`에 지정한 `Interval`로 시작 구간을 나눈다. 같은 시점에 목표 값으로 움직이는 여러 속성과 구분한다.
 
 ```dart
-late final Animation<double> _fadeAnimation = CurvedAnimation(
-  parent: _controller,
-  curve: const Interval(0.0, 0.5, curve: Easing.standard),
+late final Animation<double> _fadeAnimation = _controller.drive(
+  CurveTween(curve: const Interval(0.0, 0.5, curve: Easing.standard)),
 );
 
-late final Animation<Offset> _slideAnimation = Tween<Offset>(
-  begin: const Offset(0, 0.25),
-  end: Offset.zero,
-).animate(
-  CurvedAnimation(
-    parent: _controller,
-    curve: const Interval(0.2, 0.8, curve: Easing.emphasized),
-  ),
-);
+late final Animation<Offset> _slideAnimation =
+    Tween<Offset>(begin: const Offset(0, 0.25), end: Offset.zero).animate(
+      _controller.drive(
+        CurveTween(
+          curve: const Interval(
+            0.2,
+            0.8,
+            curve: Curves.easeInOutCubicEmphasized,
+          ),
+        ),
+      ),
+    );
 ```
 
 [시간차 예제](references/staggered-animations.md)와 [반복 예제](references/looping-animations.md)를 필요할 때 읽는다.
 
 ## 화면 전환
 
-`GoRouteData.buildPage`의 `CustomTransitionPage`로 통합한다. 여러 라우트가 공유하면 `AppPageTransitions`로 추출한다. [전환과 Hero](references/page-transitions.md)를 참고한다.
+`GoRouteData.buildPage`의 `CustomTransitionPage`로 통합한다. 여러 라우트가 공유하면 최상위 전환 함수로 추출한다. [전환과 Hero](references/page-transitions.md)를 참고한다.
 
 ## 성능과 피해야 할 패턴
 
@@ -229,6 +226,8 @@ AnimatedBuilder(
 
 크기 애니메이션으로 매 프레임 레이아웃이 발생한다면 `Transform.scale`·`Transform.translate`로 요구사항을 충족할 수 있는지 검토한다.
 
+CurveTween을 연결한 예제는 별도 상태 리스너를 소유하지 않는다. reverseCurve 등으로 CurvedAnimation을 직접 소유한다면 해당 객체도 dispose한다. const 자식의 동일 인스턴스는 Flutter가 재빌드를 생략할 수 있으므로 “항상 재빌드”라고 보고하지 않는다.
+
 ### 정적 자식의 반복 빌드
 
 ```dart
@@ -238,7 +237,7 @@ AnimatedBuilder(
   builder: (context, child) {
     return Opacity(
       opacity: _controller.value,
-      child: const ExpensiveWidget(), // 매 프레임 재빌드됨
+      child: ExpensiveWidget(), // 매 프레임 새 인스턴스를 생성함
     );
   },
 )

@@ -145,18 +145,23 @@ import 'package:flutter/material.dart';
 
 enum UploadStatus { idle, uploading, success, error }
 
-class const UploadStatusIndicator({required final UploadStatus status, super.key})
-    extends StatelessWidget {
+class const UploadStatusIndicator({
+  required final UploadStatus status,
+  super.key,
+}) extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final icon = switch (status) {
       UploadStatus.idle => const SizedBox.shrink(),
       UploadStatus.uploading => const SizedBox(
-          width: 16,
-          height: 16,
-          child: CircularProgressIndicator(strokeWidth: 2),
-        ),
-      UploadStatus.success => const Icon(Icons.check_circle, color: Colors.green),
+        width: 16,
+        height: 16,
+        child: CircularProgressIndicator(strokeWidth: 2),
+      ),
+      UploadStatus.success => const Icon(
+        Icons.check_circle,
+        color: Colors.green,
+      ),
       UploadStatus.error => const Icon(Icons.error, color: Colors.red),
     };
 
@@ -178,10 +183,14 @@ class const UploadStatusIndicator({required final UploadStatus status, super.key
 }
 ```
 
-일회성 알림은 대상 SDK의 지원 API를 확인하고 사용한다. 오래된 `announce` 예제는 최신 SDK에서 `sendAnnouncement`로 이전이 필요할 수 있다.
+일회성 알림은 [sendAnnouncement](https://api.flutter.dev/flutter/semantics/SemanticsService/sendAnnouncement.html)를 지원하는 SDK에서 아래처럼 사용한다. 구버전은 해당 SDK API를 유지한다. 지역화된 문구와 실제 읽기 방향을 전달하며 liveRegion과 중복 알림하지 않는다.
 
 ```dart
-SemanticsService.announce('Item added to cart', TextDirection.ltr);
+await SemanticsService.sendAnnouncement(
+  View.of(context),
+  'Item added to cart',
+  Directionality.of(context),
+);
 ```
 
 ## 작은 아이콘의 조작 영역
@@ -280,7 +289,7 @@ class const AccessibleReorderableList({
               IconButton(
                 icon: const Icon(Icons.arrow_downward),
                 tooltip: 'Move down',
-                // 아래로 이동할 때 ReorderableListView의 onReorder는 index + 1을 사용한다.
+                // 기존 onReorder는 제거 전 삽입 위치를 받으므로 아래 이동은 index + 2다.
                 onPressed: isLast ? null : () => onReorder(index, index + 2),
               ),
               const Icon(Icons.drag_handle),
@@ -314,20 +323,29 @@ class const AccessibleSlider({
         IconButton(
           icon: const Icon(Icons.remove),
           tooltip: 'Decrease ${label.toLowerCase()}',
-          onPressed: value > min ? () => onChanged((value - step).clamp(min, max)) : null,
+          onPressed: value > min
+              ? () => onChanged((value - step).clamp(min, max))
+              : null,
         ),
         Expanded(
           child: Semantics(
             label: label,
             value: value.toStringAsFixed(0),
             slider: true,
-            child: Slider(value: value, min: min, max: max, onChanged: onChanged),
+            child: Slider(
+              value: value,
+              min: min,
+              max: max,
+              onChanged: onChanged,
+            ),
           ),
         ),
         IconButton(
           icon: const Icon(Icons.add),
           tooltip: 'Increase ${label.toLowerCase()}',
-          onPressed: value < max ? () => onChanged((value + step).clamp(min, max)) : null,
+          onPressed: value < max
+              ? () => onChanged((value + step).clamp(min, max))
+              : null,
         ),
       ],
     );
@@ -392,7 +410,8 @@ class const FocusEnsureVisibleField({
   super.key,
 }) extends StatefulWidget {
   @override
-  State<FocusEnsureVisibleField> createState() => _FocusEnsureVisibleFieldState();
+  State<FocusEnsureVisibleField> createState() =>
+      _FocusEnsureVisibleFieldState();
 }
 
 class _FocusEnsureVisibleFieldState extends State<FocusEnsureVisibleField> {
@@ -493,14 +512,14 @@ import 'package:flutter/material.dart';
 ThemeData buildAccessibleTheme() {
   const colorScheme = ColorScheme(
     brightness: Brightness.light,
-    primary: Color(0xFF1565C0),       // 파랑 800
-    onPrimary: Color(0xFFFFFFFF),     // 흰색, primary와 8.6:1
-    secondary: Color(0xFF00695C),     // 청록 800
-    onSecondary: Color(0xFFFFFFFF),   // 흰색, secondary와 7.1:1
-    error: Color(0xFFB71C1C),         // 빨강 900
-    onError: Color(0xFFFFFFFF),       // 흰색, error와 7.8:1
-    surface: Color(0xFFFFFFFF),       // 흰색
-    onSurface: Color(0xFF212121),     // 회색 900, 흰색과 16:1
+    primary: Color(0xFF1565C0), // 파랑 800
+    onPrimary: Color(0xFFFFFFFF), // 흰색, primary와 5.75:1
+    secondary: Color(0xFF00695C), // 청록 800
+    onSecondary: Color(0xFFFFFFFF), // 흰색, secondary와 6.61:1
+    error: Color(0xFFB71C1C), // 빨강 900
+    onError: Color(0xFFFFFFFF), // 흰색, error와 6.57:1
+    surface: Color(0xFFFFFFFF), // 흰색
+    onSurface: Color(0xFF212121), // 회색 900, 흰색과 16:1
   );
 
   return ThemeData(
@@ -597,7 +616,12 @@ class AccessiblePageRoute<T> extends MaterialPageRoute<T> {
     if (MediaQuery.of(context).disableAnimations) {
       return child; // 화면을 즉시 전환한다.
     }
-    return super.buildTransitions(context, animation, secondaryAnimation, child);
+    return super.buildTransitions(
+      context,
+      animation,
+      secondaryAnimation,
+      child,
+    );
   }
 }
 ```
@@ -605,8 +629,11 @@ class AccessiblePageRoute<T> extends MaterialPageRoute<T> {
 ## 모션 감소와 Hero
 
 ```dart
-class const AccessibleHero({required final Object tag, required final Widget child, super.key})
-    extends StatelessWidget {
+class const AccessibleHero({
+  required final Object tag,
+  required final Widget child,
+  super.key,
+}) extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (MediaQuery.of(context).disableAnimations) {
@@ -673,8 +700,10 @@ class _CheckoutEmailFieldState extends State<CheckoutEmailField> {
 ## 붙여넣기·비밀번호 관리자 지원
 
 ```dart
-class const AccessiblePasswordField({required final TextEditingController controller, super.key})
-    extends StatelessWidget {
+class const AccessiblePasswordField({
+  required final TextEditingController controller,
+  super.key,
+}) extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return TextField(
@@ -711,22 +740,30 @@ class ConsistentHelpAction extends StatelessWidget {
 ## 의미 레이블 테스트
 
 ```dart
-testWidgets('Close button announces its purpose', (tester) async {
-  await tester.pumpWidget(const _Subject());
-  expect(find.bySemanticsLabel('Close dialog'), findsOneWidget);
+testWidgets('Close button exposes its label', (tester) async {
+  final handle = tester.ensureSemantics();
+  try {
+    await tester.pumpWidget(const _Subject());
+    expect(find.bySemanticsLabel('Close dialog'), findsOneWidget);
+  } finally {
+    handle.dispose();
+  }
 });
 ```
 
 ## 대상 크기 테스트
 
-크기 외 예외와 간격 기준도 함께 확인한다.
+아이콘 그림 크기 대신 실제 의미 노드의 조작 영역을 검사한다. 아래는 Android 48dp 검사이며 WCAG의 CSS px·간격·예외 판정은 별도다.
 
 ```dart
-testWidgets('Icon buttons are >= 24 dp on each axis', (tester) async {
+testWidgets('Close button meets Android tap target guideline', (tester) async {
   await tester.pumpWidget(const _Subject());
-  final size = tester.getSize(find.byIcon(Icons.close).hitTestable());
-  expect(size.width, greaterThanOrEqualTo(24));
-  expect(size.height, greaterThanOrEqualTo(24));
+  final handle = tester.ensureSemantics();
+  try {
+    await expectLater(tester, meetsGuideline(androidTapTargetGuideline));
+  } finally {
+    handle.dispose();
+  }
 });
 ```
 

@@ -23,15 +23,13 @@ tags:
 
 ```dart
 // test/helpers/test_tags.dart
-abstract class TestTag {
-  static const golden = 'golden';
-}
+const goldenTag = 'golden';
 ```
 
 ## 테스트 작성
 
 ```dart
-@Tags([TestTag.golden])
+@Tags([goldenTag])
 library;
 
 import 'package:flutter/material.dart';
@@ -42,9 +40,7 @@ import '../helpers/helpers.dart';
 void main() {
   group(ProfileCard, () {
     testWidgets('renders correctly', (tester) async {
-      await tester.pumpApp(
-        const ProfileCard(name: 'Dash', role: 'Mascot'),
-      );
+      await tester.pumpApp(const ProfileCard(name: 'Dash', role: 'Mascot'));
 
       await expectLater(
         find.byType(ProfileCard),
@@ -60,14 +56,14 @@ void main() {
 파일 전체에 지정한다.
 
 ```dart
-@Tags([TestTag.golden])
+@Tags([goldenTag])
 library;
 ```
 
 동작 테스트와 섞여 있으면 개별 지정한다.
 
 ```dart
-testWidgets('matches golden', tags: TestTag.golden, (tester) async {
+testWidgets('matches golden', tags: goldenTag, (tester) async {
   // ...
 });
 ```
@@ -81,4 +77,4 @@ testWidgets('matches golden', tags: TestTag.golden, (tester) async {
 | 골든 제외 | `flutter test --exclude-tags golden` | `exclude_tags: 'golden'` |
 | 모두 실행 | `flutter test` | 기본값 |
 
-갱신한 PNG를 눈으로 검토한다. 커밋하는 작업에서는 테스트 코드와 함께 포함한다. 태그 없는 골든, 시각 비교로 동작 검증 대체, 기준 이미지 누락, 코드 속 문자열 태그 대신 `TestTag.golden` 누락을 피한다. 실패를 숨기려고 기준 이미지를 무조건 갱신하지 않는다.
+갱신한 PNG를 눈으로 검토한다. 커밋하는 작업에서는 테스트 코드와 함께 포함한다. 태그 없는 골든, 시각 비교로 동작 검증 대체, 기준 이미지 누락, 코드 속 문자열 태그 대신 태그 누락을 피한다. 실패를 숨기려고 기준 이미지를 무조건 갱신하지 않는다.

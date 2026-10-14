@@ -4,6 +4,14 @@ Flutter·Dart 개발을 위한 한국어 Codex 플러그인입니다. 개발 스
 
 설명, 사용 조건, 작업 절차, 참고 문서와 코드의 설명 주석을 한국어로 옮겼습니다. API·패키지명, 명령어, 예제 식별자와 테스트 데이터는 원래 의미를 유지합니다. Dart 예제 일부는 3.13 이상 문법을 사용하므로 대상 프로젝트 SDK를 먼저 확인하세요.
 
+## 공식 지침과 적용 범위
+
+[Effective Dart](https://dart.dev/effective-dart)와 Flutter의 [아키텍처](https://docs.flutter.dev/app-architecture/recommendations)·[성능](https://docs.flutter.dev/perf/best-practices)·[테스트](https://docs.flutter.dev/testing/overview)·[접근성](https://docs.flutter.dev/ui/accessibility) 지침을 기준으로 삼습니다. Flutter의 분야별 문서를 단일 공식 문서인 “Effective Flutter”로 인용하지 않습니다.
+
+Bloc·Equatable·mocktail·Page/View·독립 패키지·very_good_analysis·100% 커버리지는 선택 가능한 프로젝트 관례입니다. 사용 중인 아키텍처와 도구를 먼저 따릅니다. 공식 린트 기준은 Flutter의 `flutter_lints`, Dart의 `lints`이며, 린트 통과만으로 모든 권고 준수가 보장되지는 않습니다.
+
+공유하는 [검토 기준](skills/flutter-review/SKILL.md#공식-기준과-프로젝트-관례)과 [2026-10-14 점검 기록](docs/porting.md#2026-10-14-공식-지침-대조와-예제-수정)에 차이와 수정 내역을 정리했습니다. 새 Dart 문법은 설치 SDK뿐 아니라 `pubspec.yaml`의 SDK 하한이 정하는 **언어 버전**과 코드 생성기 지원도 확인해야 합니다.
+
 ## 설치
 
 플러그인 설치와 개별 스킬 설치 중 **하나만** 선택하세요. 두 방식으로 함께 설치하면 동일 스킬이 중복 표시될 수 있습니다.

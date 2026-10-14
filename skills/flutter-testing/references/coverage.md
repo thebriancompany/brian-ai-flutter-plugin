@@ -8,8 +8,8 @@
 
 ```dart
 group('copyWith', () {
-  test('returns same instance when no arguments are provided', () {
-    const state = TodoListState(
+  test('returns equal state when no arguments are provided', () {
+    final state = TodoListState(
       status: TodoListStatus.success,
       todos: [Todo(id: '1', title: 'Test')],
     );
@@ -18,7 +18,7 @@ group('copyWith', () {
   });
 
   test('returns updated status when status is provided', () {
-    const state = TodoListState();
+    final state = TodoListState();
 
     final result = state.copyWith(status: TodoListStatus.loading);
 
@@ -27,7 +27,7 @@ group('copyWith', () {
   });
 
   test('returns updated todos when todos is provided', () {
-    const state = TodoListState();
+    final state = TodoListState();
     final todos = [Todo(id: '1', title: 'New')];
 
     final result = state.copyWith(todos: todos);
@@ -56,4 +56,4 @@ group('copyWith', () {
 | `package:test/test.dart` | 순수 Dart |
 | `package:flutter_test/flutter_test.dart` | Flutter |
 | `package:mocktail/mocktail.dart` | Mock·Fake·when·verify |
-| `../helpers/helpers.dart` | 위젯·골든 테스트의 pumpApp·TestTag |
+| `../helpers/helpers.dart` | 위젯·골든 테스트의 pumpApp·태그 상수 |

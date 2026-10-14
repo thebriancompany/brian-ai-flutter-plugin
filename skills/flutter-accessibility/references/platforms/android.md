@@ -34,7 +34,7 @@ Semantics(
 글자 굵기 플래그 등은 대상 OS에서 지원되는지 확인한다.
 
 ```dart
-if (MediaQuery.of(context).accessibilityFeatures.boldText) {
+if (MediaQuery.boldTextOf(context)) {
   // 굵은 글자 적용
 }
 ```

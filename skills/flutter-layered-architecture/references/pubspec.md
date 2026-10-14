@@ -75,7 +75,7 @@ dependencies:
     path: packages/weather_repository
 
 dev_dependencies:
-  bloc_test: ^9.1.0
+  bloc_test: ^10.0.0
   flutter_test:
     sdk: flutter
   mocktail: ^1.0.0

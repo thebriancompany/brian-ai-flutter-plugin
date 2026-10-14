@@ -13,14 +13,8 @@ class _MyWidgetState extends State<MyWidget>
   @override
   void initState() {
     super.initState();
-    _controller = AnimationController(
-      duration: Durations.medium2,
-      vsync: this,
-    );
-    _fadeAnimation = CurvedAnimation(
-      parent: _controller,
-      curve: Easing.standard,
-    );
+    _controller = AnimationController(duration: Durations.medium2, vsync: this);
+    _fadeAnimation = _controller.drive(CurveTween(curve: Easing.standard));
   }
 
   @override
@@ -34,12 +28,9 @@ class _MyWidgetState extends State<MyWidget>
     return AnimatedBuilder(
       animation: _fadeAnimation,
       builder: (context, child) {
-        return Opacity(
-          opacity: _fadeAnimation.value,
-          child: child,
-        );
+        return Opacity(opacity: _fadeAnimation.value, child: child);
       },
-      child: child, // 정적 자식은 매 프레임 재빌드하지 않는다.
+      child: widget.child, // State 예제: 위젯이 제공하는 정적 자식이다.
     );
   }
 }
@@ -52,20 +43,22 @@ class _MyWidgetState extends State<MyWidget>
 하나의 컨트롤러에서 슬라이드가 페이드 중간에 시작하도록 구간을 나눈다. 동시에 목표 값으로 이동하는 속성이라면 암시적 위젯 조합을 먼저 고려한다.
 
 ```dart
-late final Animation<double> _fadeAnimation = CurvedAnimation(
-  parent: _controller,
-  curve: const Interval(0.0, 0.5, curve: Easing.standard),
+late final Animation<double> _fadeAnimation = _controller.drive(
+  CurveTween(curve: const Interval(0.0, 0.5, curve: Easing.standard)),
 );
 
-late final Animation<Offset> _slideAnimation = Tween<Offset>(
-  begin: const Offset(0, 0.25),
-  end: Offset.zero,
-).animate(
-  CurvedAnimation(
-    parent: _controller,
-    curve: const Interval(0.2, 0.8, curve: Easing.emphasized),
-  ),
-);
+late final Animation<Offset> _slideAnimation =
+    Tween<Offset>(begin: const Offset(0, 0.25), end: Offset.zero).animate(
+      _controller.drive(
+        CurveTween(
+          curve: const Interval(
+            0.2,
+            0.8,
+            curve: Curves.easeInOutCubicEmphasized,
+          ),
+        ),
+      ),
+    );
 ```
 
 ## 위젯 갱신에 반응
@@ -80,10 +73,7 @@ class _AnimatedGlowState extends State<AnimatedGlow>
   @override
   void initState() {
     super.initState();
-    _controller = AnimationController(
-      duration: Durations.long2,
-      vsync: this,
-    );
+    _controller = AnimationController(duration: Durations.long2, vsync: this);
     if (widget.isGlowing) {
       _controller.repeat(reverse: true);
     }
@@ -138,10 +128,7 @@ class _PulsingDotState extends State<PulsingDot>
       _controller = widget.controller!;
     } else {
       _ownsController = true;
-      _controller = AnimationController(
-        duration: Durations.long2,
-        vsync: this,
-      );
+      _controller = AnimationController(duration: Durations.long2, vsync: this);
     }
   }
 
@@ -157,7 +144,7 @@ class _PulsingDotState extends State<PulsingDot>
 }
 ```
 
-위젯이 생성한 컨트롤러만 위젯에서 해제한다. 주입한 컨트롤러는 주입자가 수명을 관리한다.
+위젯이 생성한 컨트롤러만 위젯에서 해제한다. 주입한 컨트롤러는 주입자가 수명을 관리한다. 이 조각은 초기 주입만 보여 준다. 동일 State에서 controller 변경을 지원하려면 didUpdateWidget에서 기존 연결 해제·소유 컨트롤러 해제·새 연결을 구현한다. 여러 티커를 순차 생성할 수 있으면 TickerProviderStateMixin을 사용한다.
 
 ## 전환 위젯과 AnimatedBuilder
 

@@ -5,11 +5,15 @@
 ```dart
 @TypedGoRoute<FlutterArticlePageRoute>(
   name: 'flutterArticle',
-  path: 'article/:id',
+  path: '/flutter/articles/article/:id',
 )
 @immutable
-class const FlutterArticlePageRoute({required final String id})
-    extends GoRouteData {
+class FlutterArticlePageRoute extends GoRouteData
+    with $FlutterArticlePageRoute {
+  const FlutterArticlePageRoute({required this.id});
+
+  final String id;
+
   @override
   Widget build(BuildContext context, GoRouterState state) {
     return FlutterArticlePage(id: id);
@@ -24,19 +28,19 @@ class const FlutterArticlePageRoute({required final String id})
 ```dart
 @TypedGoRoute<FlutterArticlesPageRoute>(
   name: 'flutterArticles',
-  path: 'articles',
+  path: '/flutter/articles',
 )
 @immutable
-class const FlutterArticlesPageRoute({
-  final String? date,
-  final String? category,
-}) extends GoRouteData {
+class FlutterArticlesPageRoute extends GoRouteData
+    with $FlutterArticlesPageRoute {
+  const FlutterArticlesPageRoute({this.date, this.category});
+
+  final String? date;
+  final String? category;
+
   @override
   Widget build(BuildContext context, GoRouterState state) {
-    return FlutterArticlesPage(
-      date: date,
-      category: category,
-    );
+    return FlutterArticlesPage(date: date, category: category);
   }
 }
 ```

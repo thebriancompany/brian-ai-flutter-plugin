@@ -5,98 +5,97 @@
 여러 라우트가 같은 전환을 사용할 때 추출한다.
 
 ```dart
-abstract class AppPageTransitions {
-  static CustomTransitionPage<void> fade({
-    required LocalKey key,
-    required Widget child,
-  }) {
-    return CustomTransitionPage(
-      key: key,
-      child: child,
-      transitionDuration: Durations.medium4,
-      reverseTransitionDuration: Durations.medium4,
-      transitionsBuilder: (context, animation, secondaryAnimation, child) {
-        return FadeTransition(
-          opacity: CurvedAnimation(
-            parent: animation,
-            curve: Easing.emphasizedDecelerate,
-          ),
+CustomTransitionPage<void> fadePage({
+  required LocalKey key,
+  required Widget child,
+}) {
+  return CustomTransitionPage(
+    key: key,
+    child: child,
+    transitionDuration: Durations.medium4,
+    reverseTransitionDuration: Durations.medium4,
+    transitionsBuilder: (context, animation, secondaryAnimation, child) {
+      if (MediaQuery.disableAnimationsOf(context)) return child;
+      return FadeTransition(
+        opacity: animation.drive(
+          CurveTween(curve: Easing.emphasizedDecelerate),
+        ),
+        child: child,
+      );
+    },
+  );
+}
+
+CustomTransitionPage<void> slideFadePage({
+  required LocalKey key,
+  required Widget child,
+}) {
+  return CustomTransitionPage(
+    key: key,
+    child: child,
+    transitionDuration: Durations.medium4,
+    reverseTransitionDuration: Durations.medium4,
+    transitionsBuilder: (context, animation, secondaryAnimation, child) {
+      if (MediaQuery.disableAnimationsOf(context)) return child;
+      final curvedAnimation = animation.drive(
+        CurveTween(curve: Easing.emphasizedDecelerate),
+      );
+      return FadeTransition(
+        opacity: curvedAnimation,
+        child: SlideTransition(
+          position: Tween<Offset>(
+            begin: const Offset(0.05, 0),
+            end: Offset.zero,
+          ).animate(curvedAnimation),
           child: child,
-        );
-      },
-    );
-  }
+        ),
+      );
+    },
+  );
+}
 
-  static CustomTransitionPage<void> slideFade({
-    required LocalKey key,
-    required Widget child,
-  }) {
-    return CustomTransitionPage(
-      key: key,
-      child: child,
-      transitionDuration: Durations.medium4,
-      reverseTransitionDuration: Durations.medium4,
-      transitionsBuilder: (context, animation, secondaryAnimation, child) {
-        final curvedAnimation = CurvedAnimation(
-          parent: animation,
-          curve: Easing.emphasizedDecelerate,
-        );
-        return FadeTransition(
-          opacity: curvedAnimation,
-          child: SlideTransition(
-            position: Tween<Offset>(
-              begin: const Offset(0.05, 0),
-              end: Offset.zero,
-            ).animate(curvedAnimation),
-            child: child,
-          ),
-        );
-      },
-    );
-  }
-
-  static CustomTransitionPage<void> slideUp({
-    required LocalKey key,
-    required Widget child,
-  }) {
-    return CustomTransitionPage(
-      key: key,
-      child: child,
-      transitionDuration: Durations.medium4,
-      reverseTransitionDuration: Durations.medium4,
-      transitionsBuilder: (context, animation, secondaryAnimation, child) {
-        final curvedAnimation = CurvedAnimation(
-          parent: animation,
-          curve: Easing.emphasizedDecelerate,
-        );
-        return FadeTransition(
-          opacity: curvedAnimation,
-          child: SlideTransition(
-            position: Tween<Offset>(
-              begin: const Offset(0, 0.1),
-              end: Offset.zero,
-            ).animate(curvedAnimation),
-            child: child,
-          ),
-        );
-      },
-    );
-  }
+CustomTransitionPage<void> slideUpPage({
+  required LocalKey key,
+  required Widget child,
+}) {
+  return CustomTransitionPage(
+    key: key,
+    child: child,
+    transitionDuration: Durations.medium4,
+    reverseTransitionDuration: Durations.medium4,
+    transitionsBuilder: (context, animation, secondaryAnimation, child) {
+      if (MediaQuery.disableAnimationsOf(context)) return child;
+      final curvedAnimation = animation.drive(
+        CurveTween(curve: Easing.emphasizedDecelerate),
+      );
+      return FadeTransition(
+        opacity: curvedAnimation,
+        child: SlideTransition(
+          position: Tween<Offset>(
+            begin: const Offset(0, 0.1),
+            end: Offset.zero,
+          ).animate(curvedAnimation),
+          child: child,
+        ),
+      );
+    },
+  );
 }
 ```
 
 ## GoRouteData 연결
 
 ```dart
-@TypedGoRoute<DetailsPageRoute>(
-  name: 'details',
-  path: 'details/:id',
-)
+@TypedGoRoute<DetailsPageRoute>(name: 'details', path: '/details/:id')
 @immutable
-class const DetailsPageRoute({required final String id}) extends GoRouteData {
+class DetailsPageRoute extends GoRouteData with $DetailsPageRoute {
+  const DetailsPageRoute({required this.id});
+
+  final String id;
+
   @override
   Page<void> buildPage(BuildContext context, GoRouterState state) {
-    return AppPageTransitions.slideFade(
+    return slideFadePage(
       key: state.pageKey,
       child: DetailsPage(id: id),
     );

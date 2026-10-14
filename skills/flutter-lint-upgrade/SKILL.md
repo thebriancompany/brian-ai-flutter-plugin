@@ -7,6 +7,8 @@ description: "very_good_analysis 린트 패키지를 갱신하고 새 규칙의 
 
 `very_good_analysis` 버전을 올리고 새 규칙 때문에 필요한 최소 수정을 적용한다. SDK 변경이 먼저 유발한 충돌은 [SDK 업그레이드](../flutter-sdk-upgrade/SKILL.md)를 참고한다.
 
+공식 권고와 팀 관례의 구분, SDK·언어 버전, 오류·수명 처리는 [공통 기준](../flutter-review/SKILL.md#공식-기준과-프로젝트-관례)을 적용한다.
+
 ## 핵심 기준
 
 - 기본 범위는 린트 버전과 새 진단의 최소 수정이다. 요청하지 않은 정리와 동작 변경을 섞지 않는다.

@@ -113,7 +113,7 @@ testWidgets('details page slides in from right', (tester) async {
       ),
       GoRoute(
         path: '/details',
-        pageBuilder: (context, state) => AppPageTransitions.slideFade(
+        pageBuilder: (context, state) => slideFadePage(
           key: state.pageKey,
           child: const DetailsPage(),
         ),
@@ -121,6 +121,7 @@ testWidgets('details page slides in from right', (tester) async {
     ],
   );
 
+  addTearDown(router.dispose);
   await tester.pumpWidget(
     MaterialApp.router(routerConfig: router),
   );
@@ -179,13 +180,15 @@ testWidgets('pulsing dot scales when active', (tester) async {
 `forward()`·`reverse()`·`repeat()` 호출 자체가 계약이면 mocktail로 검증한다.
 
 ```dart
+// TickerFuture는 package:flutter/scheduler.dart에서 가져온다.
 class MockAnimationController extends Mock implements AnimationController {}
 
 testWidgets('stops animation when isActive becomes false', (tester) async {
   final controller = MockAnimationController();
-  when(() => controller.repeat(reverse: true)).thenReturn();
-  when(() => controller.stop()).thenReturn();
-  when(() => controller.reset()).thenReturn();
+  when(() => controller.repeat(reverse: true))
+      .thenAnswer((_) => TickerFuture.complete());
+  when(() => controller.stop()).thenAnswer((_) {});
+  when(() => controller.reset()).thenAnswer((_) {});
   when(() => controller.value).thenReturn(0.0);
   when(() => controller.status).thenReturn(AnimationStatus.dismissed);
 

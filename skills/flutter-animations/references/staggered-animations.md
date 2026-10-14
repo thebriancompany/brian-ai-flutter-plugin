@@ -15,30 +15,34 @@ class _StaggeredEntryState extends State<StaggeredEntry>
   @override
   void initState() {
     super.initState();
-    _controller = AnimationController(
-      duration: Durations.long2,
-      vsync: this,
+    _controller = AnimationController(duration: Durations.long2, vsync: this);
+
+    _fadeAnimation = _controller.drive(
+      CurveTween(curve: const Interval(0.0, 0.6, curve: Easing.standard)),
     );
 
-    _fadeAnimation = CurvedAnimation(
-      parent: _controller,
-      curve: const Interval(0.0, 0.6, curve: Easing.standard),
-    );
-
-    _slideAnimation = Tween<Offset>(
-      begin: const Offset(0, 0.15),
-      end: Offset.zero,
-    ).animate(
-      CurvedAnimation(
-        parent: _controller,
-        curve: const Interval(0.1, 0.7, curve: Easing.emphasized),
-      ),
-    );
+    _slideAnimation =
+        Tween<Offset>(begin: const Offset(0, 0.15), end: Offset.zero).animate(
+          _controller.drive(
+            CurveTween(
+              curve: const Interval(
+                0.1,
+                0.7,
+                curve: Curves.easeInOutCubicEmphasized,
+              ),
+            ),
+          ),
+        );
 
     _scaleAnimation = Tween<double>(begin: 0.95, end: 1.0).animate(
-      CurvedAnimation(
-        parent: _controller,
-        curve: const Interval(0.1, 0.7, curve: Easing.emphasized),
+      _controller.drive(
+        CurveTween(
+          curve: const Interval(
+            0.1,
+            0.7,
+            curve: Curves.easeInOutCubicEmphasized,
+          ),
+        ),
       ),
     );
 
@@ -60,10 +64,7 @@ class _StaggeredEntryState extends State<StaggeredEntry>
           opacity: _fadeAnimation.value,
           child: SlideTransition(
             position: _slideAnimation,
-            child: ScaleTransition(
-              scale: _scaleAnimation,
-              child: child,
-            ),
+            child: ScaleTransition(scale: _scaleAnimation, child: child),
           ),
         );
       },
@@ -84,41 +85,27 @@ class const StaggeredListItem({
   required final Animation<double> animation,
   required final Widget child,
   super.key,
-}) extends StatefulWidget {
-  @override
-  State<StaggeredListItem> createState() => _StaggeredListItemState();
-}
-
-class _StaggeredListItemState extends State<StaggeredListItem> {
-  late final CurvedAnimation _curvedAnimation;
-
-  @override
-  void initState() {
-    super.initState();
-    final start = (widget.index / widget.itemCount).clamp(0.0, 1.0);
-    final end = ((widget.index + 1) / widget.itemCount).clamp(0.0, 1.0);
-    _curvedAnimation = CurvedAnimation(
-      parent: widget.animation,
-      curve: Interval(start, end, curve: Easing.emphasized),
-    );
-  }
-
-  @override
-  void dispose() {
-    _curvedAnimation.dispose();
-    super.dispose();
-  }
-
+}) extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    assert(itemCount > 0 && index >= 0 && index < itemCount);
+    final curved = animation.drive(
+      CurveTween(
+        curve: Interval(
+          index / itemCount,
+          (index + 1) / itemCount,
+          curve: Curves.easeInOutCubicEmphasized,
+        ),
+      ),
+    );
     return FadeTransition(
-      opacity: _curvedAnimation,
+      opacity: curved,
       child: SlideTransition(
         position: Tween<Offset>(
           begin: const Offset(0, 0.1),
           end: Offset.zero,
-        ).animate(_curvedAnimation),
-        child: widget.child,
+        ).animate(curved),
+        child: child,
       ),
     );
   }

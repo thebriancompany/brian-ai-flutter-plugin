@@ -16,14 +16,17 @@ class const SummaryCard({required final Summary? summary, super.key})
   @override
   Widget build(BuildContext context) {
     final hasData = summary != null;
+    final duration = MediaQuery.disableAnimationsOf(context)
+        ? Duration.zero
+        : Durations.medium2;
 
     return AnimatedOpacity(
       opacity: hasData ? 1 : 0,
-      duration: Durations.medium2,
+      duration: duration,
       curve: Easing.standard,
       child: AnimatedSlide(
         offset: hasData ? Offset.zero : const Offset(0, 0.1),
-        duration: Durations.medium2,
+        duration: duration,
         curve: Easing.emphasizedDecelerate,
         child: Card(child: _SummaryContents(summary: summary)),
       ),

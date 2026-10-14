@@ -37,11 +37,11 @@ void main() {
         expect(find.text('Welcome'), findsOneWidget);
       });
 
-      testWidgets('displays loading indicator when status is loading',
-          (tester) async {
-        when(() => homeCubit.state).thenReturn(
-          const HomeState(status: HomeStatus.loading),
-        );
+      testWidgets('displays loading indicator when status is loading', (
+        tester,
+      ) async {
+        when(() => homeCubit.state)
+            .thenReturn(const HomeState(status: HomeStatus.loading));
 
         await tester.pumpApp(buildSubject());
 
@@ -50,8 +50,9 @@ void main() {
     });
 
     group('navigates', () {
-      testWidgets('to SettingsPage when settings icon is tapped',
-          (tester) async {
+      testWidgets('to SettingsPage when settings icon is tapped', (
+        tester,
+      ) async {
         await tester.pumpApp(buildSubject());
 
         await tester.tap(find.byIcon(Icons.settings));
@@ -62,8 +63,7 @@ void main() {
     });
 
     group('calls', () {
-      testWidgets('loadData when refresh button is tapped',
-          (tester) async {
+      testWidgets('loadData when refresh button is tapped', (tester) async {
         when(() => homeCubit.loadData()).thenAnswer((_) async {});
 
         await tester.pumpApp(buildSubject());
@@ -84,14 +84,12 @@ void main() {
 
 ```dart
 extension PumpApp on WidgetTester {
-  Future<void> pumpApp(
-    Widget widget, {
-    ThemeData? theme,
-  }) {
+  Future<void> pumpApp(Widget widget, {ThemeData? theme}) {
     return pumpWidget(
       MaterialApp(
         theme: theme,
         localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
         home: widget,
       ),
     );

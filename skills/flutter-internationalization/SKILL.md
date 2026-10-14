@@ -7,6 +7,8 @@ description: "Flutter ARB 번역, locale 설정, gen-l10n, 공유 위젯의 지�
 
 Flutter 기본 `flutter_localizations`·`intl`과 ARB를 사용한다. 기존 프로젝트의 지역화 도구나 사용자가 지정한 라이브러리를 요청 없이 교체하지 않는다.
 
+공식 권고와 팀 관례의 구분, SDK·언어 버전, 오류·수명 처리는 [공통 기준](../flutter-review/SKILL.md#공식-기준과-프로젝트-관례)을 적용한다.
+
 ## 핵심 기준
 
 - 사용자에게 보이는 문구를 코드에 하드코딩하지 않는다.
@@ -14,7 +16,7 @@ Flutter 기본 `flutter_localizations`·`intl`과 ARB를 사용한다. 기존 �
 - 공유 위젯은 앱의 `AppLocalizations`에 직접 의존하지 않고 번역된 문자열을 매개변수로 받는다.
 - 읽기 방향을 따라야 하는 여백·정렬·위치는 start/end 기반 API를 쓴다.
 - 언어 하나로 시작해도 지역화 경계를 미리 고려한다.
-- Dart 3.13 이상에서는 문자열 필드에 기본 생성자의 선언 매개변수를 활용하고 낮은 버전에서는 호환 문법을 유지한다.
+- 패키지 언어 버전이 Dart 3.13 이상이면 문자열 필드에 기본 생성자의 선언 매개변수를 활용하고 낮은 버전에서는 호환 문법을 유지한다.
 
 ## 구성 흐름
 
@@ -34,9 +36,11 @@ extension AppLocalizationsX on BuildContext {
 // 권장
 Text(context.l10n.helloWorld);
 
-// 피할 패턴
+// 공식 접근 방식도 유효하다(nullable-getter: false 설정 예제).
 Text(AppLocalizations.of(context).helloWorld);
 ```
+
+위 확장은 `nullable-getter: false`인 [설정 예제](references/setup.md)를 전제로 한다. 기본 nullable getter를 유지한 앱에서는 `AppLocalizations.of(this)!`처럼 실제 생성 타입에 맞춘다. `context.l10n`은 편의 관례이며 필수 API가 아니다.
 
 ## 재사용 위젯
 

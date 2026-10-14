@@ -17,9 +17,11 @@ if (result != 'CONNECTION_SECURE') {
 }
 ```
 
+별도 check 호출 한 번만으로 이후 HTTP/Dio 요청이 고정된다고 가정하지 않는다. 실제 데이터를 전송하는 클라이언트 연결에서 검증을 강제하고 실패 시 요청을 보내지 않는다.
+
 ## 생체 인증
 
-`local_auth`로 플랫폼 차이를 처리한다. 서버의 권한 검증을 대신하지 않는다.
+아래는 local_auth 3.x API다. 2.x는 AuthenticationOptions를 사용하므로 설치 버전에 맞춘다. 서버의 권한 검증을 대신하지 않으며 LocalAuthException을 처리해 실패 시 접근을 차단한다.
 
 ```dart
 // 확인 필요: 플랫폼 채널로 직접 구현한 생체 인증
@@ -29,7 +31,7 @@ final result = await platform.invokeMethod('checkFingerprint');
 final auth = LocalAuthentication();
 final didAuthenticate = await auth.authenticate(
   localizedReason: 'Confirm your identity to view this information',
-  options: const AuthenticationOptions(biometricOnly: true),
+  biometricOnly: true,
 );
 ```
 

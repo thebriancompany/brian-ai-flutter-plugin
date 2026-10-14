@@ -7,18 +7,20 @@ description: "Flutter/Dart Bloc·Cubit의 구현과 테스트를 작성하거나
 
 BLoC 패턴으로 비즈니스 로직과 화면 계층을 분리한다. 기존 프로젝트와 사용자의 명시적 선택을 우선하고 다음 기준을 적용한다.
 
+공식 권고와 팀 관례의 구분, SDK·언어 버전, 오류·수명 처리는 [공통 기준](../flutter-review/SKILL.md#공식-기준과-프로젝트-관례)을 적용한다.
+
 ## 핵심 기준
 
-- Bloc/Cubit 테스트는 `package:bloc_test`의 `blocTest()`로 작성한다. 일반 `test()`와 수동 스트림 검증으로 대체하지 않는다.
-- 모킹은 `package:mocktail`을 사용한다.
+- Bloc/Cubit의 상태 전이에는 `blocTest()`를 우선한다. 초기 상태·동기 API는 일반 `test()`로 검증할 수 있으며 직접 만든 인스턴스는 `addTearDown(bloc.close)`로 정리한다.
+- 동작을 표현하는 간단한 fake를 우선 고려하고, 호출 스텁·검증이 필요하면 기존 모킹 도구를 쓴다. 예제는 `mocktail`을 사용한다.
 - `build:` 콜백에서 매번 새로운 Bloc/Cubit을 만든다. `setUp`에서 만든 인스턴스를 여러 테스트가 공유하지 않게 하고 수명 관리는 `blocTest`에 맡긴다.
 - Bloc끼리 직접 의존하지 않는다. UI 또는 공유 저장소를 통해 통신한다.
 - Page는 `BlocProvider`로 인스턴스를 제공하고 View는 `BlocBuilder`·`BlocListener`로 소비한다.
 - 이벤트와 여러 상태 타입은 `sealed` 계층으로 표현해 Dart 3 `switch`의 완전성 검사를 활용한다.
-- 상태와 이벤트는 `Equatable`을 상속하고 `props`를 재정의해 값 동등성을 제공한다.
+- 상태는 불변으로 유지하고 필요한 값 동등성을 제공한다. 예제의 `Equatable` 외에 기존 Freezed·직접 구현도 가능하며 이벤트 동등성은 사용 목적에 따라 선택한다.
 - 비즈니스 로직은 위젯이 아니라 Bloc/Cubit에 둔다. 하나의 기능 관심사에 하나의 Bloc/Cubit을 둔다.
-- `emit`은 해당 `on<Event>` 핸들러 또는 Cubit 메서드의 수명 안에서만 호출한다. 핸들러보다 오래 살아 있는 구독·콜백에서 호출하지 않는다.
-- Dart 3.13 이상을 사용하는 프로젝트에서는 기본 생성자의 선언 매개변수(`class const ProfileRequested(final String userId) extends ProfileEvent`)를 활용한다. 낮은 SDK 버전에서는 기존 생성자 문법을 유지한다.
+- Bloc의 `Emitter`는 이벤트 핸들러 완료 후 호출하지 않는다. 비동기 작업과 `emit.forEach`는 await하고 취소 후에는 `emit.isDone`을 확인한다. Cubit의 장기 구독은 `close`에서 취소하며 비동기 완료 시 `isClosed`를 확인한다.
+- 패키지 언어 버전이 Dart 3.13 이상이고 생성 도구가 지원하는 프로젝트에서는 기본 생성자의 선언 매개변수(`class const ProfileRequested(final String userId) extends ProfileEvent`)를 활용한다. 낮은 SDK 버전에서는 기존 생성자 문법을 유지한다.
 
 ## Cubit과 Bloc 선택
 
@@ -52,6 +54,7 @@ sealed class CounterEvent extends Equatable {
 }
 
 final class CounterIncrementPressed extends CounterEvent {}
+
 final class CounterDecrementPressed extends CounterEvent {}
 
 class CounterBloc extends Bloc<CounterEvent, int> {
@@ -109,11 +112,14 @@ sealed class LoginState extends Equatable {
 }
 
 final class LoginInitial extends LoginState {}
+
 final class LoginInProgress extends LoginState {}
+
 final class const LoginSuccess({required final User user}) extends LoginState {
   @override
   List<Object> get props => [user];
 }
+
 final class const LoginFailure({required final String error})
     extends LoginState {
   @override

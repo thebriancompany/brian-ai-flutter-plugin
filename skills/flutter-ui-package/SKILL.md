@@ -7,12 +7,14 @@ description: "Flutter 공유 UI 패키지를 생성하거나 위젯·디자인 �
 
 Material 위젯 위에 앱 전용 컴포넌트와 `ThemeExtension` 디자인 토큰을 구성한다. 색상·서체·간격·다크 모드의 기초는 [Material 테마](../flutter-material-theming/SKILL.md)를 함께 참고한다.
 
+공식 권고와 팀 관례의 구분, SDK·언어 버전, 오류·수명 처리는 [공통 기준](../flutter-review/SKILL.md#공식-기준과-프로젝트-관례)을 적용한다.
+
 ## 핵심 기준
 
 - 새 UI 패키지는 지원되는 경우 `very_good create app_ui_package` 템플릿을 사용한다. 테마·내보내기 파일·테스트 헬퍼·Widgetbook이 포함된다. 실행 전 설치된 CLI의 `--help`로 템플릿 지원 여부를 확인한다.
 - `flutter/material.dart`와 Material 컴포넌트를 조합한다. 이미 있는 버튼·입력 기본 요소를 다시 만들지 않는다.
-- 공개 위젯은 snake_case 파일 하나에 하나씩 둔다.
-- 공개 위젯·테마와 `material.dart`를 하나의 배럴 파일에서 내보낸다. 소비자는 `package:<name>/src/...`를 직접 가져오지 않는다. 사용하지 않는 코드는 트리 셰이킹 대상이 된다.
+- 파일명은 lowercase_with_underscores를 사용한다. 공개 위젯별 파일 분리는 기본 관례이며 작고 밀접한 타입을 같은 라이브러리에 둘 수도 있다.
+- 공개 위젯·테마를 배럴 파일에서 내보낸다. `material.dart` 전체 재노출은 패키지 API 정책으로 선택하며 필수는 아니다. 소비자는 `package:<name>/src/...`를 직접 가져오지 않는다. 사용하지 않는 코드는 트리 셰이킹 대상이 된다.
 - 기본 색상 역할은 `ColorScheme`, 서체는 `TextTheme`에 둔다. 추가 토큰만 `ThemeExtension`에 넣고 `ThemeData.extensions`에 등록한 뒤 `BuildContext` 확장으로 읽는다.
 - 위젯 동작·콜백·상태를 패키지의 `pumpApp` 헬퍼로 테스트한다.
 - 공개 클래스에는 `App` 같은 일관된 접두사를 쓰고 가능한 생성자는 `const`로 선언한다. 공개 클래스·매개변수·메서드에 dartdoc을 쓴다.
@@ -54,7 +56,7 @@ my_ui/
 ## 위젯 API
 
 - `FilledButton`, `OutlinedButton`, `TextField`, `Card` 등을 조합한다.
-- 최소한의 매개변수만 받고 `key`·`child`·`children` 이외에는 명명된 인수를 사용한다.
+- 최소한의 매개변수만 받고 새 위젯 API에서는 `super.key`와 `child`·`children`을 포함해 명명된 인수를 우선한다. 기존 Flutter API의 위치 인수는 그대로 따른다.
 - 기본값은 테마에서 얻는다.
 - 콜백은 `VoidCallback`, `ValueChanged<T>` 또는 구체적 typedef로 선언한다.
 - 선택적 슬롯은 `Widget?`로 제공한다.

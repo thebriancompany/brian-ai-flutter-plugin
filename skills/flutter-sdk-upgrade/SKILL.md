@@ -7,6 +7,8 @@ description: "Dart·Flutter SDK와 pubspec 환경 제약, CI 버전을 갱신하
 
 SDK 제약과 CI 버전을 일관되게 갱신한다. 기본 변경 범위는 SDK와 그 검증에 필요한 파일이며 사용자가 추가로 요청한 호환성 수정도 범위에 포함한다. 예제 CI 공급자를 기존 프로젝트에 강제하지 않는다.
 
+공식 권고와 팀 관례의 구분, SDK·언어 버전, 오류·수명 처리는 [공통 기준](../flutter-review/SKILL.md#공식-기준과-프로젝트-관례)을 적용한다.
+
 ## 핵심 기준
 
 - Flutter 버전과 번들 Dart 버전은 다르다. `environment.sdk`에는 Dart 버전을 쓴다.

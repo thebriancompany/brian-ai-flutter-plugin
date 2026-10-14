@@ -24,7 +24,9 @@ import 'package:my_app/counter/counter.dart';
 void main() {
   group('CounterCubit', () {
     test('initial state is 0', () {
-      expect(CounterCubit().state, equals(0));
+      final cubit = CounterCubit();
+      addTearDown(cubit.close);
+      expect(cubit.state, equals(0));
     });
 
     blocTest<CounterCubit, int>(
@@ -92,8 +94,11 @@ void main() {
       act: (bloc) => bloc.add(const TodosSubscriptionRequested()),
       expect: () => [
         const TodosState(status: TodosStatus.loading),
-        isA<TodosState>()
-            .having((s) => s.status, 'status', TodosStatus.failure),
+        isA<TodosState>().having(
+          (s) => s.status,
+          'status',
+          TodosStatus.failure,
+        ),
       ],
     );
   });
@@ -143,18 +148,15 @@ void main() {
   });
 
   group('TodosView', () {
-    testWidgets('renders loading indicator when status is loading',
-        (tester) async {
-      when(() => todosBloc.state).thenReturn(
-        const TodosState(status: TodosStatus.loading),
-      );
+    testWidgets('renders loading indicator when status is loading', (
+      tester,
+    ) async {
+      when(() => todosBloc.state)
+          .thenReturn(const TodosState(status: TodosStatus.loading));
 
       await tester.pumpWidget(
         MaterialApp(
-          home: BlocProvider.value(
-            value: todosBloc,
-            child: const TodosView(),
-          ),
+          home: BlocProvider.value(value: todosBloc, child: const TodosView()),
         ),
       );
 
@@ -163,16 +165,12 @@ void main() {
 
     testWidgets('renders todos when status is success', (tester) async {
       final todos = [Todo(id: '1', title: 'Test Todo')];
-      when(() => todosBloc.state).thenReturn(
-        TodosState(status: TodosStatus.success, todos: todos),
-      );
+      when(() => todosBloc.state)
+          .thenReturn(TodosState(status: TodosStatus.success, todos: todos));
 
       await tester.pumpWidget(
         MaterialApp(
-          home: BlocProvider.value(
-            value: todosBloc,
-            child: const TodosView(),
-          ),
+          home: BlocProvider.value(value: todosBloc, child: const TodosView()),
         ),
       );
 

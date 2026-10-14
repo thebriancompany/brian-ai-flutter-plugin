@@ -7,6 +7,8 @@ description: "Flutter go_router의 타입 안전한 라우트, 화면 이동, �
 
 `go_router`를 사용하는 앱의 라우팅과 딥 링크를 다룬다. 기존 라우터를 요청 없이 교체하지 않는다. 전환 모션은 [애니메이션](../flutter-animations/SKILL.md)을 함께 참고한다.
 
+공식 권고와 팀 관례의 구분, SDK·언어 버전, 오류·수명 처리는 [공통 기준](../flutter-review/SKILL.md#공식-기준과-프로젝트-관례)을 적용한다.
+
 ## 핵심 기준
 
 - `GoRouteData`와 `@TypedGoRoute`·`go_router_builder`로 타입 안전한 라우트와 생성된 이동 메서드를 사용한다.
@@ -26,7 +28,7 @@ description: "Flutter go_router의 타입 안전한 라우트, 화면 이동, �
   /flutter/chat
   /flutter/articles
     /flutter/articles?category=all
-    /flutter/article/:id
+    /flutter/articles/article/:id
 /android
   /android/news
   /android/chat
@@ -70,7 +72,7 @@ final result = await DialogPageRoute().push<String>(context);
 // 권장
 context.goNamed('flutterNews');
 
-// 피할 패턴
+// 공식 API도 유효하다.
 GoRouter.of(context).goNamed('flutterNews');
 ```
 

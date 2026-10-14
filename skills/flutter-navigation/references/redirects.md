@@ -38,13 +38,10 @@ GoRouter _routes(GlobalKey<NavigatorState> navigatorKey) {
   name: 'premium',
   path: '/premium',
   routes: [
-    TypedGoRoute<PremiumShowsPageRoute>(
-      name: 'premiumShows',
-      path: 'shows',
-    ),
+    TypedGoRoute<PremiumShowsPageRoute>(name: 'premiumShows', path: 'shows'),
   ],
 )
-class PremiumPageRoute extends GoRouteData {
+class PremiumPageRoute extends GoRouteData with $PremiumPageRoute {
   @override
   String? redirect(BuildContext context, GoRouterState state) {
     final status = context.read<AppBloc>().state.user.status;

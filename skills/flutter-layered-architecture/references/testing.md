@@ -19,6 +19,10 @@ void main() {
     late http.Client httpClient;
     late UserApiClient subject;
 
+    setUpAll(() {
+      registerFallbackValue(Uri.parse('https://example.com'));
+    });
+
     setUp(() {
       httpClient = _MockHttpClient();
       subject = UserApiClient(
@@ -51,21 +55,22 @@ void main() {
               .having((r) => r.displayName, 'displayName', 'Dash'),
         );
 
-        verify(
-          () => httpClient.get(Uri.parse('https://api.test.com/users/1')),
-        ).called(1);
+        verify(() => httpClient.get(Uri.parse('https://api.test.com/users/1')))
+            .called(1);
       });
 
       test('throws $UserApiException when status is not 200', () {
-        when(() => httpClient.get(any())).thenAnswer(
-          (_) async => http.Response('Not found', 404),
-        );
+        when(() => httpClient.get(any()))
+            .thenAnswer((_) async => http.Response('Not found', 404));
 
         expect(
           () => subject.getUser('1'),
           throwsA(
-            isA<UserApiException>()
-                .having((e) => e.statusCode, 'statusCode', 404),
+            isA<UserApiException>().having(
+              (e) => e.statusCode,
+              'statusCode',
+              404,
+            ),
           ),
         );
       });
@@ -123,9 +128,8 @@ void main() {
       });
 
       test('throws $UserNotFoundException when API returns 404', () {
-        when(() => userApiClient.getUser(userId)).thenThrow(
-          const UserApiException(404, 'Not found'),
-        );
+        when(() => userApiClient.getUser(userId))
+            .thenThrow(const UserApiException(404, 'Not found'));
 
         expect(
           () => subject.getUser(userId),
@@ -133,16 +137,18 @@ void main() {
         );
       });
 
-      test('rethrows $UserApiException for non-404 errors', () {
-        when(() => userApiClient.getUser(userId)).thenThrow(
-          const UserApiException(500, 'Server error'),
-        );
+      test('throws $UserLoadException for non-404 errors', () {
+        when(() => userApiClient.getUser(userId))
+            .thenThrow(const UserApiException(500, 'Server error'));
 
         expect(
           () => subject.getUser(userId),
           throwsA(
-            isA<UserApiException>()
-                .having((e) => e.statusCode, 'statusCode', 500),
+            isA<UserLoadException>().having(
+              (e) => e.statusCode,
+              'statusCode',
+              500,
+            ),
           ),
         );
       });
@@ -153,7 +159,7 @@ void main() {
 
 ## 모노레포 전체 실행
 
-대상 앱 루트에서 지원되는 `very_good test --recursive --coverage --min-coverage 100`을 사용할 수 있다. 실제 옵션은 `--help`로 확인한다. MCP에서는 셸 옵션 문자열을 넘기지 말고 스키마의 `recursive`, `coverage`, `min_coverage`, `directory` 필드를 사용한다. 모든 하위 패키지 결과를 확인한다.
+대상 앱 루트에서 지원되는 `very_good test --recursive --coverage --min-coverage <프로젝트-목표>`을 사용할 수 있다. 실제 옵션은 `--help`로 확인한다. MCP에서는 셸 옵션 문자열을 넘기지 말고 스키마의 `recursive`, `coverage`, `min_coverage`, `directory` 필드를 사용한다. 모든 하위 패키지 결과를 확인한다.
 
 ## 기준
 

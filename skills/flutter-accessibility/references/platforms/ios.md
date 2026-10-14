@@ -28,17 +28,21 @@ Semantics(
   liveRegion: true,
   child: Text('Status: $status'),
 )
-SemanticsService.announce('Status changed to $status', TextDirection.ltr);
+// liveRegion으로 전달되지 않을 때만 별도로 호출한다.
+await SemanticsService.sendAnnouncement(
+  View.of(context),
+  'Status changed to $status',
+  Directionality.of(context),
+);
 ```
 
 상호작용 중 알림이 끊기는지, 제목 계층이 실제로 어떻게 노출되는지 확인한다. 고대비·반전 플래그는 플랫폼 지원을 확인한다.
 
 ```dart
-final features = MediaQuery.of(context).accessibilityFeatures;
-if (features.highContrast) {
+if (MediaQuery.highContrastOf(context)) {
   // 고대비 색상 적용
 }
-if (features.invertColors) {
+if (MediaQuery.invertColorsOf(context)) {
   // 색 반전 처리
 }
 ```

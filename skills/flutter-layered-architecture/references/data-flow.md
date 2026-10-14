@@ -30,7 +30,8 @@ Future<void> _onLoadRequested(
     emit(ProfileSuccess(user: user));
   } on UserNotFoundException {
     emit(const ProfileNotFound());
-  } catch (_) {
+  } on Exception catch (error, stackTrace) {
+    addError(error, stackTrace);
     emit(const ProfileFailure());
   }
 }
@@ -38,7 +39,7 @@ Future<void> _onLoadRequested(
 
 ## 3. 저장소에서 데이터 클라이언트 호출
 
-API의 404는 저장소의 `UserNotFoundException`으로 변환해 Bloc이 `ProfileNotFound`를 표시하도록 한다. 나머지 API 예외는 그대로 다시 던진다. 예외 정의는 [전체 예제](worked-example.md)를 참고한다.
+API의 404는 저장소의 `UserNotFoundException`으로 변환해 Bloc이 `ProfileNotFound`를 표시하도록 한다. 나머지 API 응답 오류는 도메인 예외 UserLoadException으로 변환한다. 예외 정의는 [전체 예제](worked-example.md)를 참고한다.
 
 ```dart
 // packages/user_repository/lib/src/user_repository.dart
@@ -55,7 +56,7 @@ Future<User> getUser(String userId) async {
     if (e.statusCode == 404) {
       throw UserNotFoundException(userId);
     }
-    rethrow;
+    throw UserLoadException(e.statusCode);
   }
 }
 ```
@@ -65,9 +66,7 @@ Future<User> getUser(String userId) async {
 ```dart
 // packages/user_api_client/lib/src/user_api_client.dart
 Future<UserResponse> getUser(String userId) async {
-  final response = await _httpClient.get(
-    Uri.parse('$_baseUrl/users/$userId'),
-  );
+  final response = await _httpClient.get(Uri.parse('$_baseUrl/users/$userId'));
 
   if (response.statusCode != 200) {
     throw UserApiException(response.statusCode, response.body);

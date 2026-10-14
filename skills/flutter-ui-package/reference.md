@@ -6,34 +6,26 @@
 | --- | --- |
 | `AppColors extends ThemeExtension<AppColors>` | ColorScheme에 없는 success·warning·info와 on 역할 |
 | `AppSpacing extends ThemeExtension<AppSpacing>` | xxs~xxlg 간격과 copyWith·lerp |
-| `AppTheme` | ColorScheme과 확장을 결합한 밝은·어두운 ThemeData |
+| `lightTheme`·`darkTheme` | ColorScheme과 확장을 결합한 밝은·어두운 ThemeData |
 | `AppThemeBuildContext` | context.appColors·context.appSpacing 접근 |
 
 모든 확장은 테마 애니메이션을 위해 `copyWith`·`lerp`를 구현한다. 접근자 작성과 `ThemeData.extensions` 등록을 함께 수행한다.
 
 ```dart
-abstract class AppTheme {
-  static ThemeData get light => ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: _seedColor),
-        extensions: const <ThemeExtension<dynamic>>[
-          AppColors.light,
-          AppSpacing(),
-        ],
-      );
+ThemeData get lightTheme => ThemeData(
+  colorScheme: ColorScheme.fromSeed(seedColor: _seedColor),
+  extensions: const <ThemeExtension<dynamic>>[AppColors.light, AppSpacing()],
+);
 
-  static ThemeData get dark => ThemeData(
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: _seedColor,
-          brightness: Brightness.dark,
-        ),
-        extensions: const <ThemeExtension<dynamic>>[
-          AppColors.dark,
-          AppSpacing(),
-        ],
-      );
+ThemeData get darkTheme => ThemeData(
+  colorScheme: ColorScheme.fromSeed(
+    seedColor: _seedColor,
+    brightness: Brightness.dark,
+  ),
+  extensions: const <ThemeExtension<dynamic>>[AppColors.dark, AppSpacing()],
+);
 
-  static const _seedColor = Color(0xFF6750A4);
-}
+const _seedColor = Color(0xFF6750A4);
 
 extension AppThemeBuildContext on BuildContext {
   /// Material의 [ColorScheme]에 없는 추가 색상 토큰.
@@ -50,13 +42,10 @@ extension AppThemeBuildContext on BuildContext {
 
 ```dart
 extension PumpApp on WidgetTester {
-  Future<void> pumpApp(
-    Widget widget, {
-    ThemeData? theme,
-  }) {
+  Future<void> pumpApp(Widget widget, {ThemeData? theme}) {
     return pumpWidget(
       MaterialApp(
-        theme: theme ?? AppTheme.light,
+        theme: theme ?? lightTheme,
         home: Scaffold(body: widget),
       ),
     );
@@ -85,7 +74,7 @@ export 'src/widgets/app_text_field.dart';
 
 - `use_cases/`에 위젯별 파일과 `@widgetbook.UseCase(name:, type:)` 최상위 함수를 둔다.
 - `UseCaseDecorator`로 공통 배경을 제공한다.
-- `ThemeAddon`에 `AppTheme.light`·`dark`를 연결한다.
+- `ThemeAddon`에 `lightTheme`·`darkTheme`를 연결한다.
 - `build_runner`로 주석을 읽어 `widgetbook.directories.g.dart`를 생성한다.
 
 | 명령 | 용도 |

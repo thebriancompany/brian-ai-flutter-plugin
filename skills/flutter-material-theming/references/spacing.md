@@ -5,30 +5,28 @@
 ## AppSpacing
 
 ```dart
-abstract class AppSpacing {
-  static const double spaceUnit = 16;
+const double spacingSpaceUnit = 16;
 
-  /// 4px
-  static const double xxs = 0.25 * spaceUnit;
+/// 4px
+const double spacingXxs = 0.25 * spacingSpaceUnit;
 
-  /// 6px
-  static const double xs = 0.375 * spaceUnit;
+/// 6px
+const double spacingXs = 0.375 * spacingSpaceUnit;
 
-  /// 8px
-  static const double sm = 0.5 * spaceUnit;
+/// 8px
+const double spacingSm = 0.5 * spacingSpaceUnit;
 
-  /// 12px
-  static const double md = 0.75 * spaceUnit;
+/// 12px
+const double spacingMd = 0.75 * spacingSpaceUnit;
 
-  /// 16px
-  static const double lg = spaceUnit;
+/// 16px
+const double spacingLg = spacingSpaceUnit;
 
-  /// 24px
-  static const double xlg = 1.5 * spaceUnit;
+/// 24px
+const double spacingXlg = 1.5 * spacingSpaceUnit;
 
-  /// 32px
-  static const double xxlg = 2 * spaceUnit;
-}
+/// 32px
+const double spacingXxlg = 2 * spacingSpaceUnit;
 ```
 
 ## 적용 예제
@@ -36,11 +34,11 @@ abstract class AppSpacing {
 ```dart
 Padding(
   padding: EdgeInsets.symmetric(
-    horizontal: AppSpacing.lg,
-    vertical: AppSpacing.md,
+    horizontal: spacingLg,
+    vertical: spacingMd,
   ),
   child: Column(
-    spacing: AppSpacing.sm,
+    spacing: spacingSm,
     children: [
       // 위젯
     ],

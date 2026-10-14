@@ -1,74 +1,80 @@
 # 접근성 테스트 예제
 
-의미 정보·대상 크기·포커스·대비·텍스트 확대·모션·폼을 검증한다. 아래는 앱의 위젯과 헬퍼에 맞춰 수정할 예제이며 자동 검사만으로 전체 WCAG 준수를 인증하지 않는다. Android 48dp·iOS 44pt 검사와 WCAG AA 최소 기준을 구분한다.
+의미 정보·대상 크기·포커스·대비·텍스트 확대·모션·폼을 검증한다. 아래는 앱의 위젯과 헬퍼에 맞춰 수정할 예제이며 자동 검사만으로 전체 WCAG 준수를 인증하지 않는다. Android 48dp·iOS 44pt 검사와 WCAG AA 최소 기준을 구분한다. 의미 플래그 검사는 실제 화면 낭독의 발화를 증명하지 않는다. `findsOneWidget`만으로 텍스트 잘림이나 모션 감소가 검증되었다고 보고하지 않는다.
 
 ```dart
 import 'package:flutter/material.dart';
-import 'package:flutter/semantics.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   // --- A. 의미 정보와 화면 낭독 ---
   group('Semantics', () {
-    testWidgets('all images have semantic labels', (tester) async {
+    testWidgets('informational image exposes a label', (tester) async {
       final handle = tester.ensureSemantics();
-
-      await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: Image(
-              image: AssetImage('assets/logo.png'),
-              semanticLabel: 'Company logo',
+      try {
+        await tester.pumpWidget(
+          MaterialApp(
+            home: Scaffold(
+              body: Semantics(
+                image: true,
+                label: 'Company logo',
+                child: const SizedBox(width: 48, height: 48),
+              ),
             ),
           ),
-        ),
-      );
+        );
 
-      final semantics = tester.getSemantics(find.byType(Image));
-      expect(semantics.label, isNotEmpty);
-
-      handle.dispose();
+        final semantics = tester.getSemantics(
+          find.bySemanticsLabel('Company logo'),
+        );
+        expect(semantics.label, isNotEmpty);
+      } finally {
+        handle.dispose();
+      }
     });
 
     testWidgets('icon buttons have tooltips', (tester) async {
       final handle = tester.ensureSemantics();
-
-      await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: IconButton(
-              icon: const Icon(Icons.search),
-              tooltip: 'Search',
-              onPressed: () {},
+      try {
+        await tester.pumpWidget(
+          MaterialApp(
+            home: Scaffold(
+              body: IconButton(
+                icon: const Icon(Icons.search),
+                tooltip: 'Search',
+                onPressed: () {},
+              ),
             ),
           ),
-        ),
-      );
+        );
 
-      expect(find.byTooltip('Search'), findsOneWidget);
-
-      handle.dispose();
+        expect(find.byTooltip('Search'), findsOneWidget);
+      } finally {
+        handle.dispose();
+      }
     });
 
-    testWidgets('live region announces status changes', (tester) async {
+    testWidgets('status exposes live region semantics', (tester) async {
       final handle = tester.ensureSemantics();
-
-      await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: Semantics(
-              liveRegion: true,
-              child: Text('Loading complete'),
+      try {
+        await tester.pumpWidget(
+          MaterialApp(
+            home: Scaffold(
+              body: Semantics(
+                liveRegion: true,
+                child: const Text('Loading complete'),
+              ),
             ),
           ),
-        ),
-      );
+        );
 
-      final semantics = tester.getSemantics(find.text('Loading complete'));
-      expect(semantics.hasFlag(SemanticsFlag.isLiveRegion), isTrue);
-
-      handle.dispose();
+        final semantics = tester.getSemantics(find.text('Loading complete'));
+        expect(semantics.flagsCollection.isLiveRegion, isTrue);
+      } finally {
+        handle.dispose();
+      }
     });
   });
 
@@ -98,10 +104,7 @@ void main() {
         MaterialApp(
           home: Scaffold(
             body: Center(
-              child: TextButton(
-                onPressed: () {},
-                child: const Text('Action'),
-              ),
+              child: TextButton(onPressed: () {}, child: const Text('Action')),
             ),
           ),
         ),
@@ -188,32 +191,51 @@ void main() {
       }
     });
 
-    testWidgets('interactive elements are focusable', (tester) async {
+    testWidgets('button and link can be activated with keyboard', (
+      tester,
+    ) async {
+      var buttonActivations = 0;
+      var linkActivations = 0;
+      final buttonFocus = FocusNode();
+      final linkFocus = FocusNode();
+      addTearDown(buttonFocus.dispose);
+      addTearDown(linkFocus.dispose);
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
             body: Column(
               children: [
-                ElevatedButton(onPressed: () {}, child: const Text('Button')),
-                InkWell(onTap: () {}, child: const Text('Link')),
+                ElevatedButton(
+                  focusNode: buttonFocus,
+                  onPressed: () => buttonActivations++,
+                  child: const Text('Button'),
+                ),
+                InkWell(
+                  focusNode: linkFocus,
+                  onTap: () => linkActivations++,
+                  child: const Text('Link'),
+                ),
               ],
             ),
           ),
         ),
       );
-
-      // 두 요소 모두 Focus 조상을 가진다.
-      final buttonFocus = Focus.of(
-        tester.element(find.byType(ElevatedButton)),
-      );
-      expect(buttonFocus.canRequestFocus, isTrue);
+      buttonFocus.requestFocus();
+      await tester.pump();
+      await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+      expect(buttonActivations, 1);
+      linkFocus.requestFocus();
+      await tester.pump();
+      await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+      expect(linkActivations, 1);
     });
   });
 
   // --- D. 색상 대비 ---
   group('Color contrast', () {
-    testWidgets('error state uses icon and label, not just color',
-        (tester) async {
+    testWidgets('error state uses icon and label, not just color', (
+      tester,
+    ) async {
       await tester.pumpWidget(
         const MaterialApp(
           home: Scaffold(
@@ -236,14 +258,15 @@ void main() {
 
   // --- E. 글자 확대 ---
   group('Text scaling', () {
-    testWidgets('text container uses minHeight, not fixed height',
-        (tester) async {
+    testWidgets('text container uses minHeight, not fixed height', (
+      tester,
+    ) async {
       await tester.pumpWidget(
-        const MaterialApp(
+        MaterialApp(
           home: Scaffold(
             body: ConstrainedBox(
-              constraints: BoxConstraints(minHeight: 48),
-              child: Text('Scalable text'),
+              constraints: const BoxConstraints(minHeight: 48),
+              child: const Text('Scalable text'),
             ),
           ),
         ),
@@ -253,55 +276,61 @@ void main() {
       expect(find.text('Scalable text'), findsOneWidget);
     });
 
-    testWidgets('text is not clipped at 2x scale', (tester) async {
+    testWidgets('text lays out without truncation at 2x scale', (tester) async {
       await tester.pumpWidget(
-        MediaQuery(
-          data: const MediaQueryData(textScaler: TextScaler.linear(2)),
-          child: const MaterialApp(
-            home: Scaffold(
-              body: SingleChildScrollView(
-                child: ConstrainedBox(
-                  constraints: BoxConstraints(minHeight: 48),
-                  child: Text('This text should not be clipped'),
-                ),
+        MaterialApp(
+          builder: (context, child) => MediaQuery(
+            data: MediaQuery.of(context)
+                .copyWith(textScaler: const TextScaler.linear(2)),
+            child: child!,
+          ),
+          home: const Scaffold(
+            body: SizedBox(
+              width: 240,
+              child: SingleChildScrollView(
+                child: Text('This text should wrap without being clipped'),
               ),
             ),
           ),
         ),
       );
-
-      expect(find.text('This text should not be clipped'), findsOneWidget);
+      final finder = find.text('This text should wrap without being clipped');
+      final paragraph = tester.renderObject<RenderParagraph>(finder);
+      expect(paragraph.textScaler.scale(16), 32);
+      expect(paragraph.didExceedMaxLines, isFalse);
+      expect(tester.takeException(), isNull);
+      // 상위 Stack·ClipRect 등의 잘림과 실제 화면 낭독은 별도 화면 검증이 필요하다.
     });
   });
 
   // --- F. 애니메이션과 모션 ---
   group('Animation & motion', () {
-    testWidgets('animations are disabled when disableAnimations is true',
-        (tester) async {
+    testWidgets('reduced motion selects zero duration', (tester) async {
       await tester.pumpWidget(
-        MediaQuery(
-          data: const MediaQueryData(disableAnimations: true),
-          child: MaterialApp(
-            home: Scaffold(
-              body: Builder(
-                builder: (context) {
-                  final disabled =
-                      MediaQuery.of(context).disableAnimations;
-                  return AnimatedContainer(
-                    duration: disabled
-                        ? Duration.zero
-                        : const Duration(milliseconds: 300),
-                    color: Colors.blue,
-                    child: const Text('Animated'),
-                  );
-                },
+        MaterialApp(
+          builder: (context, child) => MediaQuery(
+            data: MediaQuery.of(context).copyWith(disableAnimations: true),
+            child: child!,
+          ),
+          home: Scaffold(
+            body: Builder(
+              builder: (context) => AnimatedContainer(
+                duration: MediaQuery.disableAnimationsOf(context)
+                    ? Duration.zero
+                    : const Duration(milliseconds: 300),
+                color: Colors.blue,
+                child: const Text('Animated'),
               ),
             ),
           ),
         ),
       );
-
-      expect(find.text('Animated'), findsOneWidget);
+      expect(
+        tester
+            .widget<AnimatedContainer>(find.byType(AnimatedContainer))
+            .duration,
+        Duration.zero,
+      );
     });
   });
 }
