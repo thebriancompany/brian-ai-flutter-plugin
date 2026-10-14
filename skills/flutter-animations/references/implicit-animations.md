@@ -44,7 +44,9 @@ class const SummaryCard({required final Summary? summary, super.key})
 ```dart
 TweenAnimationBuilder<double>(
   tween: Tween(begin: 0, end: isActive ? 1.0 : 0.0),
-  duration: Durations.medium2,
+  duration: MediaQuery.disableAnimationsOf(context)
+      ? Duration.zero
+      : Durations.medium2,
   curve: Easing.standard,
   builder: (context, value, child) {
     return Transform.scale(
