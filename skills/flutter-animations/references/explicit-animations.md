@@ -15,6 +15,7 @@ class _MyWidgetState extends State<MyWidget>
     super.initState();
     _controller = AnimationController(duration: Durations.medium2, vsync: this);
     _fadeAnimation = _controller.drive(CurveTween(curve: Easing.standard));
+    _controller.forward();
   }
 
   @override

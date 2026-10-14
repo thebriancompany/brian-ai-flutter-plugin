@@ -106,8 +106,13 @@ class UserApiClient {
 
   /// 지정한 [userId]의 사용자를 조회한다.
   Future<UserResponse> getUser(String userId) async {
+    // 빈 ID와 경로 탐색 세그먼트는 요청 전에 거부한다.
+    if (userId.isEmpty || userId == '.' || userId == '..') {
+      throw ArgumentError.value(userId, 'userId', '유효한 사용자 ID가 필요합니다.');
+    }
+    final usersUri = Uri.parse('$_baseUrl/users');
     final response = await _httpClient.get(
-      Uri.parse('$_baseUrl/users/$userId'),
+      usersUri.replace(pathSegments: [...usersUri.pathSegments, userId]),
     );
 
     if (response.statusCode != 200) {
